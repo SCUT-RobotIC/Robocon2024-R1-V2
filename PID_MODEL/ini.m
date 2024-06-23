@@ -1,0 +1,260 @@
+% Subsystem 1
+
+SPD_D_CH1_1 = 0;
+SPD_P_CH1_1 = 0;
+SPD_I_CH1_1 = 0;
+
+ANG_S_P_CH1_1 = 0;
+ANG_S_I_CH1_1 = 0;
+ANG_S_D_CH1_1 = 0;
+
+ANG_A_P_CH1_1 = 0;
+ANG_A_I_CH1_1 = 0;
+ANG_A_D_CH1_1 = 0;
+
+TRANS_CH1_1 = 0.5;
+DEADBAND_CH1_1 = 500;
+
+% Subsystem 2
+SPD_P_CH1_2 = 0;
+SPD_I_CH1_2 = 0;
+SPD_D_CH1_2 = 0;
+
+ANG_S_P_CH1_2 = 0;
+ANG_S_I_CH1_2 = 0;
+ANG_S_D_CH1_2 = 0;
+
+ANG_A_P_CH1_2 = 0;
+ANG_A_I_CH1_2 = 0;
+ANG_A_D_CH1_2 = 0;
+
+TRANS_CH1_2 = 0.5;
+DEADBAND_CH1_2 = 500;
+
+% Subsystem 3
+SPD_P_CH1_3 = 0;
+SPD_I_CH1_3 = 0;
+SPD_D_CH1_3 = 0;
+
+ANG_S_P_CH1_3 = 0;
+ANG_S_I_CH1_3 = 0;
+ANG_S_D_CH1_3 = 0;
+
+ANG_A_P_CH1_3 = 0;
+ANG_A_I_CH1_3 = 0;
+ANG_A_D_CH1_3 = 0;
+
+TRANS_CH1_3 = 0.5;
+DEADBAND_CH1_3 = 500;
+
+% Subsystem 4
+SPD_P_CH1_4 = 0;
+SPD_I_CH1_4 = 0;
+SPD_D_CH1_4 = 0;
+
+ANG_S_P_CH1_4 = 0;
+ANG_S_I_CH1_4 = 0;
+ANG_S_D_CH1_4 = 0;
+
+ANG_A_P_CH1_4 = 0;
+ANG_A_I_CH1_4 = 0;
+ANG_A_D_CH1_4 = 0;
+
+TRANS_CH1_4 = 0.5;
+DEADBAND_CH1_4 = 500;
+
+% Subsystem 5
+SPD_P_CH1_5 = 0;
+SPD_I_CH1_5 = 0;
+SPD_D_CH1_5 = 0;
+
+ANG_S_P_CH1_5 = 0;
+ANG_S_I_CH1_5 = 0;
+ANG_S_D_CH1_5 = 0;
+
+ANG_A_P_CH1_5 = 0;
+ANG_A_I_CH1_5 = 0;
+ANG_A_D_CH1_5 = 0;
+
+TRANS_CH1_5 = 0.5;
+DEADBAND_CH1_5 = 500;
+
+% Subsystem 6
+SPD_P_CH1_6 = 0;
+SPD_I_CH1_6 = 0;
+SPD_D_CH1_6 = 0;
+
+ANG_S_P_CH1_6 = 0;
+ANG_S_I_CH1_6 = 0;
+ANG_S_D_CH1_6 = 0;
+
+ANG_A_P_CH1_6 = 0;
+ANG_A_I_CH1_6 = 0;
+ANG_A_D_CH1_6 = 0;
+
+TRANS_CH1_6 = 0.5;
+DEADBAND_CH1_6 = 500;
+
+% Subsystem 7
+SPD_P_CH1_7 = 0;
+SPD_I_CH1_7 = 0;
+SPD_D_CH1_7 = 0;
+
+ANG_S_P_CH1_7 = 0;
+ANG_S_I_CH1_7 = 0;
+ANG_S_D_CH1_7 = 0;
+
+ANG_A_P_CH1_7 = 0;
+ANG_A_I_CH1_7 = 0;
+ANG_A_D_CH1_7 = 0;
+
+TRANS_CH1_7 = 0.5;
+DEADBAND_CH1_7 = 500;
+
+% Subsystem 8
+
+SPD_P_CH1_8 = 0;
+SPD_I_CH1_8 = 0;
+SPD_D_CH1_8 = 0;
+
+ANG_S_P_CH1_8 = 0;
+ANG_S_I_CH1_8 = 0;
+ANG_S_D_CH1_8 = 0;
+
+ANG_A_P_CH1_8 = 0;
+ANG_A_I_CH1_8 = 0;
+ANG_A_D_CH1_8 = 0;
+
+TRANS_CH1_8 = 0.5;
+DEADBAND_CH1_8 = 500;
+
+% Channel 2
+
+% Subsystem 1
+SPD_P_CH2_1 = 0;
+SPD_I_CH2_1 = 0;
+SPD_D_CH2_1 = 0;
+
+ANG_S_P_CH2_1 = 0;
+ANG_S_I_CH2_1 = 0;
+ANG_S_D_CH2_1 = 0;
+
+ANG_A_P_CH2_1 = 0;
+ANG_A_I_CH2_1 = 0;
+ANG_A_D_CH2_1 = 0;
+
+TRANS_CH2_1 = 0.5;
+DEADBAND_CH2_1 = 500;
+
+% Subsystem 2
+SPD_P_CH2_2 = 0;
+SPD_I_CH2_2 = 0;
+SPD_D_CH2_2 = 0;
+
+ANG_S_P_CH2_2 = 0;
+ANG_S_I_CH2_2 = 0;
+ANG_S_D_CH2_2 = 0;
+
+ANG_A_P_CH2_2 = 0;
+ANG_A_I_CH2_2 = 0;
+ANG_A_D_CH2_2 = 0;
+
+TRANS_CH2_2 = 0.5;
+DEADBAND_CH2_2 = 500;
+
+% Subsystem 3
+SPD_P_CH2_3 = 0;
+SPD_I_CH2_3 = 0;
+SPD_D_CH2_3 = 0;
+
+ANG_S_P_CH2_3 = 0;
+ANG_S_I_CH2_3 = 0;
+ANG_S_D_CH2_3 = 0;
+
+ANG_A_P_CH2_3 = 0;
+ANG_A_I_CH2_3 = 0;
+ANG_A_D_CH2_3 = 0;
+
+TRANS_CH2_3 = 0.5;
+DEADBAND_CH2_3 = 500;
+
+% Subsystem 4
+SPD_P_CH2_4 = 0;
+SPD_I_CH2_4 = 0;
+SPD_D_CH2_4 = 0;
+
+ANG_S_P_CH2_4 = 0;
+ANG_S_I_CH2_4 = 0;
+ANG_S_D_CH2_4 = 0;
+
+ANG_A_P_CH2_4 = 0;
+ANG_A_I_CH2_4 = 0;
+ANG_A_D_CH2_4 = 0;
+
+TRANS_CH2_4 = 0.5;
+DEADBAND_CH2_4 = 500;
+
+% Subsystem 5
+SPD_P_CH2_5 = 0;
+SPD_I_CH2_5 = 0;
+SPD_D_CH2_5 = 0;
+
+ANG_S_P_CH2_5 = 0;
+ANG_S_I_CH2_5 = 0;
+ANG_S_D_CH2_5 = 0;
+
+ANG_A_P_CH2_5 = 0;
+ANG_A_I_CH2_5 = 0;
+ANG_A_D_CH2_5 = 0;
+
+TRANS_CH2_5 = 0.5;
+DEADBAND_CH2_5 = 500;
+
+% Subsystem 6
+SPD_P_CH2_6 = 0;
+SPD_I_CH2_6 = 0;
+SPD_D_CH2_6 = 0;
+
+ANG_S_P_CH2_6 = 0;
+ANG_S_I_CH2_6 = 0;
+ANG_S_D_CH2_6 = 0;
+
+ANG_A_P_CH2_6 = 0;
+ANG_A_I_CH2_6 = 0;
+ANG_A_D_CH2_6 = 0;
+
+TRANS_CH2_6 = 0.5;
+DEADBAND_CH2_6 = 500;
+
+% Subsystem 7
+SPD_P_CH2_7 = 0;
+SPD_I_CH2_7 = 0;
+SPD_D_CH2_7 = 0;
+
+ANG_S_P_CH2_7 = 0;
+ANG_S_I_CH2_7 = 0;
+ANG_S_D_CH2_7 = 0;
+
+ANG_A_P_CH2_7 = 0;
+ANG_A_I_CH2_7 = 0;
+ANG_A_D_CH2_7 = 0;
+
+TRANS_CH2_7 = 0.5;
+DEADBAND_CH2_7 = 500;
+
+% Subsystem 8
+
+SPD_P_CH2_8 = 0;
+SPD_I_CH2_8 = 0;
+SPD_D_CH2_8 = 0;
+
+ANG_S_P_CH2_8 = 0;
+ANG_S_I_CH2_8 = 0;
+ANG_S_D_CH2_8 = 0;
+
+ANG_A_P_CH2_8 = 0;
+ANG_A_I_CH2_8 = 0;
+ANG_A_D_CH2_8 = 0;
+
+TRANS_CH2_8 = 0.5;
+DEADBAND_CH2_8 = 500;
