@@ -245,7 +245,7 @@ void STOP(void)
   output[CH1_6] = 0;
   output[CH1_7] = 0;
   output[CH2_7] = 0;
-  CAN1_cmd_chassis(output[CH1_1], output[CH1_2], output[CH1_3], output[CH1_4], output[CH1_5], output[CH1_6], output[CH1_7], 0);
+  // CAN1_cmd_chassis(output[CH1_1], output[CH1_2], output[CH1_3], output[CH1_4], output[CH1_5], output[CH1_6], output[CH1_7], 0);
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_init, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_init, 20000, 20);
 }
@@ -374,32 +374,31 @@ void StartDefaultTask(void *argument)
       }
     }
 
-    /* 遥控器断连停�?
-       factor1[0]++;
+    // 遥控器断连停�?
+    factor1[0]++;
 
-       if (receivefactor[0] == 0) // 没接收到就增加标志位
-         factor[0]++;
-       if (factor[0] > 300)
-       {
-         Vx = 0;
-         Vy = 0;
-         omega = 0;
+    if (receivefactor[0] == 0) // 没接收到就增加标志位
+      factor[0]++;
+    if (factor[0] > 300)
+    {
+      Vx = 0;
+      Vy = 0;
+      omega = 0;
 
-         rx = 0;
-         ry = 0;
-         lx = 0;
-         ly = 0;
-         factor[0] = 301;
-       } // 1s没收到就全部停下
-       if (receivefactor[0] == 1) // 接收到就标志位置0
-         factor[0] = 0;
+      rx = 0;
+      ry = 0;
+      lx = 0;
+      ly = 0;
+      factor[0] = 301;
+    } // 1s没收到就全部停下
+    if (receivefactor[0] == 1) // 接收到就标志位置0
+      factor[0] = 0;
 
-       if (factor1[0] == 50)
-       {
-         receivefactor[0] = 0; // 0.05s更新1次确定为没接收到
-         factor1[0] = 0;
-       }
-    */
+    if (factor1[0] == 50)
+    {
+      receivefactor[0] = 0; // 0.05s更新1次确定为没接收到
+      factor1[0] = 0;
+    }
 
     /* 上位机断连停�?
         factor1[1]++;
@@ -430,10 +429,10 @@ void StartDefaultTask(void *argument)
     get_msgn();
 
     set_mode(VEL, VEL, VEL, VEL, VEL, VEL, VEL,
-             ANG, ANG, ANG, VEL, VEL, VEL, VEL); 
+             ANG, ANG, ANG, VEL, VEL, VEL, VEL);
 
     // ctrlmotor(temp_Vx, temp_Vy, temp_omega);
-     ctrlmotor(Vx, Vy, omega);
+    ctrlmotor(Vx, Vy, omega);
     osDelay(1);
   }
   /* USER CODE END StartDefaultTask */
@@ -452,48 +451,42 @@ void StartBallTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    // rtU.yaw_target4 = SHOOT_UP_TGT;
-    // rtU.yaw_speed_rpm4 = motor_data[4]->speed_rpm;
+    rtU.yaw_target_CH1_5 = SHOOT_UP_TGT;
+    rtU.yaw_target_CH1_6 = -SHOOT_DOWN_TGT;
+    rtU.yaw_target_CH1_7 = SHOOT_DOWN_TGT;
 
-    // rtU.yaw_target5 = -SHOOT_DOWN_TGT;
-    // rtU.yaw_target6 = SHOOT_DOWN_TGT;
 
-    // rtU.yaw_speed_rpm5 = motor_data[5]->speed_rpm;
-    // rtU.yaw_speed_rpm6 = motor_data[6]->speed_rpm;
+    rtU.yaw_target_CH2_5 = LIFT_TGT;
 
-    // rtU.yaw_target7 = LIFT_TGT;
-    // rtU.yaw_speed_rpm7 = motor_data[7]->speed_rpm;
-
-    // output[4] = rtY.yaw_SPD_OUT4;
-    // output[5] = rtY.yaw_SPD_OUT5;
-    // output[6] = rtY.yaw_SPD_OUT6;
-    // output[7] = rtY.yaw_SPD_OUT7;
-
-    // CAN1_cmd_chassis(output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
-
-    // motor_state_update();
     // __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, temp_compare_value1);
     // __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, temp_compare_value2);
 
-    // switch (temp_BUTTON_State)
-    // {
+    switch (BUTTON_State)
+    {
 
-    // case 1:
-    //   // Emergency Stop
-    //   STOP();
-    //   break;
+    case 1:
+      // Emergency Stop
+      STOP();
+      break;
 
-    // case 2:
-    //   // R1 Ball ON
-    //   R1_BALL_STEP();
-    //   break;
+    case 2:
+      // R1 Ball ON
+      R1_BALL_STEP();
+      break;
 
-    // case 3:
-    //   LIFT_TGT = 8000;
-    //   break;
-    // default:
-    //   break;
-    // }
+    case 3:
+      LIFT_TGT = 8000;
+      break;
+    
+    case 4:
+      // 备场射球临时测试
+      SHOOT_UP_TGT = 0;
+      SHOOT_DOWN_TGT = 6000;
+      break;
+
+    default:
+      break;
+    }
     osDelay(1);
   }
   /* USER CODE END StartBallTask */

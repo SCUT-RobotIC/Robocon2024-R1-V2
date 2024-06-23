@@ -132,6 +132,7 @@ void CAL_MESSAGE(void)
 			if ((B1 & 0x04) == 0 && (DataRe.data[BOT1] & 0x04) == 0x04)
 			{
 				// 按下按键3
+				BUTTON_State = 1;
 			}
 			else if ((B1 & 0x04) == 0x04 && (DataRe.data[BOT1] & 0x04) == 0)
 			{
@@ -141,6 +142,7 @@ void CAL_MESSAGE(void)
 			if ((B1 & 0x08) == 0 && (DataRe.data[BOT1] & 0x08) == 0x08)
 			{
 				// 按下按键4
+				BUTTON_State = 4; // 单射球临时测试
 			}
 			else if ((B1 & 0x08) == 0x08 && (DataRe.data[BOT1] & 0x08) == 0)
 			{
