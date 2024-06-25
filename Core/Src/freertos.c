@@ -147,30 +147,30 @@ MotorExtentTypeDef motorExtent = {
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
-    .name = "defaultTask",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityNormal,
+  .name = "defaultTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for ballTask */
 osThreadId_t ballTaskHandle;
 const osThreadAttr_t ballTask_attributes = {
-    .name = "ballTask",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityLow,
+  .name = "ballTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for clampTask */
 osThreadId_t clampTaskHandle;
 const osThreadAttr_t clampTask_attributes = {
-    .name = "clampTask",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityLow,
+  .name = "clampTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for clampPIDTask */
 osThreadId_t clampPIDTaskHandle;
 const osThreadAttr_t clampPIDTask_attributes = {
-    .name = "clampPIDTask",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityLow,
+  .name = "clampPIDTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -260,12 +260,11 @@ void StartClampPIDTask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
- * @brief  FreeRTOS initialization
- * @param  None
- * @retval None
- */
-void MX_FREERTOS_Init(void)
-{
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
+void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -306,6 +305,7 @@ void MX_FREERTOS_Init(void)
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
+
 }
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -374,7 +374,7 @@ void StartDefaultTask(void *argument)
       }
     }
 
-    /* 遥控器断连停�?
+    /* 遥控器断连停�??
        factor1[0]++;
 
        if (receivefactor[0] == 0) // 没接收到就增加标志位
@@ -401,7 +401,7 @@ void StartDefaultTask(void *argument)
        }
     */
 
-    /* 上位机断连停�?
+    /* 上位机断连停�??
         factor1[1]++;
 
         if (receivefactor[1] == 0) // 没接收到就增加标志位
@@ -548,3 +548,4 @@ void StartClampPIDTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
+

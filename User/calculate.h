@@ -31,7 +31,9 @@ typedef struct struct_message
 
 // 全局变量，按键状态
 extern uint8_t BUTTON_State;
-
+extern uint8_t test_count1;
+extern uint8_t test_count2;
+extern uint8_t B1_count[8];
 // 结构体
 extern DataPacket DataRe;
 // 摇杆变量

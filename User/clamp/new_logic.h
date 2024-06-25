@@ -22,6 +22,8 @@ extern float YAW_TGT[8];
 extern uint8_t LOGIC_FLAG;
 extern uint8_t next_state;
 extern uint8_t current_state;
+extern uint8_t servo_flag;
+extern uint8_t servo_state;
 
 void handle_M_3508_UP(void);
 void handle_M_3508_DOWN(void);
