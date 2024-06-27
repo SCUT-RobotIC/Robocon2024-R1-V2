@@ -1,0 +1,2 @@
+
+  SHOOT_DOWN_TGT = 700

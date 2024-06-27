@@ -122,7 +122,6 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -307,7 +306,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     HAL_UART_Receive_DMA(&huart2, aRxBuffer2, 1);
     if (USART2_RX_STA > USART_REC_LEN)
       USART2_RX_STA = 0;                                                              //
-    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �?????测包头包尾以及数据包长度
+    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �??????测包头包尾以及数据包长度
     {
       Receive();
       receivefactor[1] = 1;

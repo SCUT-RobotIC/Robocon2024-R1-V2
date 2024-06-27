@@ -101,7 +101,7 @@ REAL_COOR RC;
 const int M3508_MAX = 8911;
 const int M2006_MAX = 14976;
 
-const int ROLL_init = 150, GIVE_init = 155;
+const int ROLL_init = 120, GIVE_init = 26;
 int ROLL_ANG = ROLL_init, GIVE_ANG = GIVE_init;
 int ROLL_state = 0, GIVE_state = 0;
 
@@ -191,49 +191,28 @@ void Set_servo(TIM_HandleTypeDef *htim, uint32_t Channel, uint8_t angle, uint32_
 
 void R1_Ball_ON(void)
 {
-  ROLL_ANG = 60;
-  GIVE_ANG = 155;
+  ROLL_ANG = 0;
+  GIVE_ANG = 26;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   SHOOT_UP_TGT = 0;
-  SHOOT_DOWN_TGT = 0;
-  LIFT_TGT = 8000;
+  SHOOT_DOWN_TGT = 8000;
+  LIFT_TGT = -14000;
 }
 
 void R1_BALL_STEP(void)
 {
-  SHOOT_UP_TGT = 3000;
-  SHOOT_DOWN_TGT = 7000;
-  ROLL_ANG = 150;
+  ROLL_ANG = 120;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
-  HAL_Delay(7000);
+  HAL_Delay(1000);
 
-  GIVE_ANG = 145;
-  Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
+  GIVE_ANG = 80;
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
-  HAL_Delay(500);
-
-  GIVE_ANG = 135;
-  Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
-  HAL_Delay(500);
-
-  GIVE_ANG = 120;
-  Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
-  HAL_Delay(2000);
+  HAL_Delay(1000);
 
   R1_Ball_ON();
 }
 
-void R1_Ball_OFF(void)
-{
-  SHOOT_UP_TGT = 0;
-  SHOOT_DOWN_TGT = 0;
-  LIFT_TGT = 0;
-  ROLL_ANG = 150;
-  GIVE_ANG = 155;
-  Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
-  Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
-}
 
 void STOP(void)
 {

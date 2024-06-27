@@ -81,16 +81,16 @@ void handle_HIGH_TORQUE(uint8_t *motorExtent)
 void task_yaw_catch(void)
 {
     handle_FRONT_CATCH_SERVO_ON();
-    HAL_Delay(500);
-    YAW_TGT[M_3508] = 720;
-    YAW_TGT[M_3508_L] = 720;
+    HAL_Delay(200);
+    YAW_TGT[M_3508] = 400;
+    YAW_TGT[M_3508_L] = -400;
 }
 
 void task_yaw_replace(void)
 {
     YAW_TGT[M_3508] = 0;
     YAW_TGT[M_3508_L] = 0;
-    HAL_Delay(1000);
+    HAL_Delay(500);
     handle_FRONT_CATCH_SERVO_OFF();
 }
 
@@ -98,7 +98,7 @@ void init(void)
 {
     motorExtent.state = 0xab;
     HIGH_TROQUE_TRANS_FLAG = 1;
-    HAL_Delay(1000);
+    HAL_Delay(500);
     YAW_TGT[M_3508] = 0;
     YAW_TGT[M_3508_L] = 0;
     servo_flag = 1;
@@ -111,7 +111,7 @@ void close(void)
     servo_state = 4;
     motorExtent.state = 0xcd;
     HIGH_TROQUE_TRANS_FLAG = 1;
-    HAL_Delay(1000);
+    HAL_Delay(500);
     YAW_TGT[M_3508] = 0; 
     YAW_TGT[M_3508_L] = 0;
 }
