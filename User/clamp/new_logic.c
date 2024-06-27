@@ -4,13 +4,13 @@
 void handle_M_3508_UP(void)
 {
     // ANG_TAG
-    YAW_TGT[M_3508] = 720;
+    //YAW_TGT[M_3508] = 720;
 }
 
 void handle_M_3508_DOWN(void)
 {
     // ANG_TAG
-    YAW_TGT[M_3508] = 0;
+    //YAW_TGT[M_3508] = 0;
 }
 
 void handle_FRONT_CATCH_SERVO_ON(void)
@@ -44,13 +44,13 @@ void handle_FRONT_LEN_SERVO_OFF(void)
 void handle_TRANS_ON(void)
 {
     // SPD_TAG
-    YAW_TGT[M_2006] = 360;
+
 }
 
 void handle_TRANS_OFF(void)
 {
     // SPD_TAG
-    YAW_TGT[M_2006] = 0;
+
 }
 
 void handle_BACK_SERVO_ON(void)
@@ -81,14 +81,16 @@ void handle_HIGH_TORQUE(uint8_t *motorExtent)
 void task_yaw_catch(void)
 {
     handle_FRONT_CATCH_SERVO_ON();
-    HAL_Delay(1000);
+    HAL_Delay(500);
     YAW_TGT[M_3508] = 720;
+    YAW_TGT[M_3508_L] = 720;
 }
 
 void task_yaw_replace(void)
 {
     YAW_TGT[M_3508] = 0;
-    HAL_Delay(2000);
+    YAW_TGT[M_3508_L] = 0;
+    HAL_Delay(1000);
     handle_FRONT_CATCH_SERVO_OFF();
 }
 
@@ -98,16 +100,20 @@ void init(void)
     HIGH_TROQUE_TRANS_FLAG = 1;
     HAL_Delay(1000);
     YAW_TGT[M_3508] = 0;
+    YAW_TGT[M_3508_L] = 0;
+    servo_flag = 1;
+    servo_state = 3;
 }
 
 void close(void)
 {
-    motorExtent.state = 0xab;
+    servo_flag = 1;
+    servo_state = 4;
+    motorExtent.state = 0xcd;
     HIGH_TROQUE_TRANS_FLAG = 1;
     HAL_Delay(1000);
-    YAW_TGT[M_3508] = 0;
-    servo_flag = 1;
-    servo_state = 3;
+    YAW_TGT[M_3508] = 0; 
+    YAW_TGT[M_3508_L] = 0;
 }
 
 func_ptr func_table[] = {

@@ -250,92 +250,87 @@
         <Ww>
           <count>0</count>
           <WinNumber>2</WinNumber>
-          <ItemText>logic_change</ItemText>
+          <ItemText>RC,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>2</WinNumber>
-          <ItemText>RC,0x0A</ItemText>
+          <ItemText>Vx</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Vx</ItemText>
+          <ItemText>Vy</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Vy</ItemText>
+          <ItemText>omega</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>2</WinNumber>
-          <ItemText>omega</ItemText>
+          <ItemText>rx,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>2</WinNumber>
-          <ItemText>rx,0x0A</ItemText>
+          <ItemText>ry,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>2</WinNumber>
-          <ItemText>ry,0x0A</ItemText>
+          <ItemText>lx,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>2</WinNumber>
-          <ItemText>lx,0x0A</ItemText>
+          <ItemText>ly,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>2</WinNumber>
-          <ItemText>ly,0x0A</ItemText>
+          <ItemText>SWITCH_LB_State</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>2</WinNumber>
-          <ItemText>temp_Vx</ItemText>
+          <ItemText>next_state</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>2</WinNumber>
-          <ItemText>temp_Vy</ItemText>
+          <ItemText>LOGIC_FLAG</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>2</WinNumber>
-          <ItemText>temp_omega</ItemText>
+          <ItemText>motor_data1[3],0x0A</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>2</WinNumber>
-          <ItemText>SWITCH_LB_State</ItemText>
+          <ItemText>output[10]</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>2</WinNumber>
-          <ItemText>next_state</ItemText>
+          <ItemText>output[9]</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>2</WinNumber>
-          <ItemText>LOGIC_FLAG</ItemText>
+          <ItemText>rtU.yaw_target_CH2_4</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>2</WinNumber>
-          <ItemText>test_count1,0x0A</ItemText>
+          <ItemText>rtU.yaw_target_CH2_3</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>2</WinNumber>
-          <ItemText>test_count2,0x0A</ItemText>
-        </Ww>
-        <Ww>
-          <count>17</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>B1_count,0x0A</ItemText>
+          <ItemText>rtP.ANG_S_P_CH2_4</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>

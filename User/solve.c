@@ -13,33 +13,6 @@ double deadband = 50;
 double top = 2000;
 double a1, a2, a3, a4, a5, a6;
 
-// void Receive(uint8_T RX, uint8_T RY, uint8_T Rtheta, uint8_T TX, uint8_T TY, uint8_T Ttheta ,
-//	           uint8_T RX1,uint8_T RY1,uint8_T Rtheta1,uint8_T TX1,uint8_T TY1,uint8_T Ttheta1){
-
-//
-//	RC.theta=(Rtheta << 8) | Rtheta1;
-//	RC.x=    (RX << 8)     | RX1;
-//	RC.y=    (RY << 8)     | RY1;
-//	TC.x=    (TX << 8)     | TX1;
-//	TC.y=    (TY << 8)     | TY1;
-//	TC.theta=(Ttheta << 8) |Ttheta1;
-//
-////
-////	RC.theta= Rtheta;
-////	RC.x=     RX;
-////	RC.y=     RY;
-////	TC.x=     TX;
-////	TC.y=     TY;
-////	TC.theta=Ttheta;
-////
-////
-////	RC.theta = (RC.theta & 0x8000) ? (RC.theta | 0xFFFF0000) : RC.theta;
-////  RC.x = (RC.x & 0x8000) ? (RC.x | 0xFFFF0000) : RC.x;
-////  RC.y = (RC.y & 0x8000) ? (RC.y | 0xFFFF0000) : RC.y;
-////  TC.x = (TC.x & 0x8000) ? (TC.x | 0xFFFF0000) : TC.x;
-////  TC.y = (TC.y & 0x8000) ? (TC.y | 0xFFFF0000) : TC.y;
-////  TC.theta = (TC.theta & 0x8000) ? (TC.theta | 0xFFFF0000) : TC.theta;
-//}
 void Receive()
 {
   //	if(fabs((double)RC.xlast-RC.x)<1000)

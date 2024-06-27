@@ -46,7 +46,6 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-
 typedef struct __FILE FILE;
 /* USER CODE END PTD */
 
@@ -64,17 +63,17 @@ int receivefactor[2];
 int factor[2] = {0};
 int factor1[2] = {0};
 
-uint8_t next_state=0;
+uint8_t next_state = 0;
 uint8_t current_state;
 double theta[4];
-uint8_t servo_flag=0;
-uint8_t servo_state=0;
+uint8_t servo_flag = 0;
+uint8_t servo_state = 0;
 
 DataPacket DataRe;
 int16_t lx, ly, rx, ry, lp, rp;
 uint8_t B1, B2;
 uint8_t Cal_Parity;
-uint8_t B1_count[8]={0,0,0,0,0,0,0,0};
+uint8_t B1_count[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 uint8_t USART_FLAG = 0;
 uint8_T BUTTON_State = 0;
@@ -82,8 +81,8 @@ uint8_T BUTTON_State = 0;
 extern int can_output[8];
 extern uint8_t data[10];
 double TEST_ANG[2] = {0, 0};
-uint8_t test_count1=0;
-uint8_t test_count2=0;
+uint8_t test_count1 = 0;
+uint8_t test_count2 = 0;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -123,6 +122,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+
   HAL_Init();
 
   /* USER CODE BEGIN Init */
@@ -179,21 +179,22 @@ int main(void)
   PID_Angle_S_Para_Init(1, 4, 1.5, 0.3, 0.01);
   PID_Angle_A_Para_Init(1, 4, 0.5, 0.1, 0.01);
 
-
   // Clamp PID Init
-  PID_Speed_Para_Init(2, 4, 0.6901*3 ,2.3727*0.8, 0.0126); // 2006 Conveyor
-
-  PID_Angle_S_Para_Init(2, 3,0.6901*0.75 , 2.3727 * 0.17, 0.01);
+  PID_Angle_S_Para_Init(2, 3, 0.6901 * 0.75, 2.3727 * 0.17, 0.01);
   PID_Angle_A_Para_Init(2, 3, 0.83005 * 0.85, 0.38548 * 0.02, 0.04);
 
-  rtP.TRANS_CH2_3 = 0.4;
-  rtP.TRANS_CH2_4 = 0.1;
+  PID_Angle_S_Para_Init(2, 4, 0.6901 * 0.75, 2.3727 * 0.17, 0.01);
+  PID_Angle_A_Para_Init(2, 4, 0.83005 * 0.85, 0.38548 * 0.02, 0.04);
+
+  rtP.TRANS_CH2_3 = 0.7;
+  rtP.TRANS_CH2_4 = 0.7;
 
   rtP.DEADBAND_CH2_3 = 800;
   rtP.DEADBAND_CH2_4 = 800;
 
   HAL_Delay(500);
-	YAW_TGT[M_3508] = 0;
+  YAW_TGT[M_3508] = 0;
+  YAW_TGT[M_3508_L] = 0;
   motorExtent.state = 0xab;
 
   /* USER CODE END 2 */
@@ -270,7 +271,6 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   if (huart->Instance == USART3)
@@ -307,7 +307,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     HAL_UART_Receive_DMA(&huart2, aRxBuffer2, 1);
     if (USART2_RX_STA > USART_REC_LEN)
       USART2_RX_STA = 0;                                                              //
-    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �???测包头包尾以及数据包长度
+    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �?????测包头包尾以及数据包长度
     {
       Receive();
       receivefactor[1] = 1;
@@ -362,8 +362,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 1 */
   if (htim == &htim10)
   {
-    if(HIGH_TROQUE_TRANS_FLAG){
-      if(HAL_I2C_Master_Transmit_DMA(&hi2c1, (uint16_t)I2C_SLAVE_ADDRESS, (uint8_t *)&motorExtent, sizeof(motorExtent))!= HAL_OK)
+    if (HIGH_TROQUE_TRANS_FLAG)
+    {
+      if (HAL_I2C_Master_Transmit_DMA(&hi2c1, (uint16_t)I2C_SLAVE_ADDRESS, (uint8_t *)&motorExtent, sizeof(motorExtent)) != HAL_OK)
       {
         /* Error_Handler() function is called when Timeout error occurs.
           When Acknowledge failure occurs (Slave don't acknowledge it's address)
@@ -372,53 +373,51 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         {
           Error_Handler();
         }
-      }else{
-        HIGH_TROQUE_TRANS_FLAG=0;
+      }
+      else
+      {
+        HIGH_TROQUE_TRANS_FLAG = 0;
       }
     }
 
-    if(servo_flag){
+    if (servo_flag)
+    {
       switch (servo_state)
       {
-        case 1:
-          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
-          //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+      case 1:
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+        // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
         break;
-        case 2:
-          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
-          //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+      case 2:
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+        // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
         break;
-        case 3:
-          HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+      case 3:
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
         break;
-        default:
+      case 4:
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+        break;
+      default:
         break;
       }
-      servo_state=0;
-      servo_flag=0;
+      servo_state = 0;
+      servo_flag = 0;
     }
     /* Host Machine Serial Trans */
-    HAL_UART_Transmit_DMA(&huart2, data, 10);
+    // HAL_UART_Transmit_DMA(&huart2, data, 10);
 
-    /* CLAMP FUCTION */ 
-    /* 3508 */
+    /* CLAMP FUCTION */
+    /* Right Claw 3508 */
     ANG_TGT[M_3508] = YAW_TGT[M_3508] * 3591 * 8191 / (187 * 360);
     rtU.yaw_target_CH2_3 = ANG_TGT[M_3508];
-    // rtU.yaw_circle_CH2_3 = motor_data1[M_3508]->circle;
-    // rtU.yaw_speed_rpm_CH2_3 = motor_data1[M_3508]->speed_rpm;
-    // rtU.yaw_ecd_CH2_3 = motor_data1[M_3508]->ecd;
-    // rtU.yaw_last_ecd_CH2_3 = motor_data1[M_3508]->last_ecd;
-    /* OUT PUT */
-    // motor_data1[M_3508]->circle = rtU.yaw_circle_CH2_3;
 
-    /* 2006 */
-    rtU.yaw_target_CH2_4 = SPD_TGT[M_2006];
-    // rtU.yaw_circle_CH2_4 = motor_data1[M_2006]->circle;
-    // rtU.yaw_speed_rpm_CH2_4 = motor_data1[M_2006]->speed_rpm;
-    // rtU.yaw_ecd_CH2_4 = motor_data1[M_2006]->ecd;
-    // rtU.yaw_last_ecd_CH2_4 = motor_data1[M_2006]->last_ecd;
-    /* OUT PUT */
-    // motor_data1[M_2006]->circle = rtU.yaw_circle_CH2_4;
+    /* Left Claw 3508 */
+    
+    ANG_TGT[M_3508_L] = YAW_TGT[M_3508_L] * 3591 * 8191 / (187 * 360);
+    rtU.yaw_target_CH2_4 = ANG_TGT[M_3508_L];
 
     assign_output();
     PID_MODEL_step();

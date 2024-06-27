@@ -3,9 +3,8 @@
 #include "main.h"
 #include "i2c.h"
 
-#define M_2006 3
 #define M_3508 2
-
+#define M_3508_L 3
 typedef struct
 {
   uint8_t state;

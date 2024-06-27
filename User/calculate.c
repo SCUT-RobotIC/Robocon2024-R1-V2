@@ -109,7 +109,7 @@ void CAL_MESSAGE(void)
 			// 按键更新
 			if ((B1 & 0x01) == 0 && (DataRe.data[BOT1] & 0x01) == 0x01)
 			{
-				B1_count[0]++;
+				//B1_count[0]++;
 				// 按下按键1
 
 				if (!LOGIC_FLAG)
@@ -125,7 +125,7 @@ void CAL_MESSAGE(void)
 
 			if ((B1 & 0x02) == 0 && (DataRe.data[BOT1] & 0x02) == 0x02)
 			{
-				B1_count[1]++;
+				//B1_count[1]++;
 				// 按下按键2
 				if (!LOGIC_FLAG)
 				{
@@ -140,7 +140,7 @@ void CAL_MESSAGE(void)
 
 			if ((B1 & 0x04) == 0 && (DataRe.data[BOT1] & 0x04) == 0x04)
 			{
-				B1_count[2]++;
+				//B1_count[2]++;
 				// 按下按键
 				if (!LOGIC_FLAG)
 				{
@@ -155,7 +155,7 @@ void CAL_MESSAGE(void)
 
 			if ((B1 & 0x08) == 0 && (DataRe.data[BOT1] & 0x08) == 0x08)
 			{
-				B1_count[3]++;
+				//B1_count[3]++;
 				// 按下按键4
 			}
 			else if ((B1 & 0x08) == 0x08 && (DataRe.data[BOT1] & 0x08) == 0)
@@ -165,7 +165,12 @@ void CAL_MESSAGE(void)
 
 			if ((B1 & 0x10) == 0 && (DataRe.data[BOT1] & 0x10) == 0x10)
 			{
-				B1_count[4]++;
+				if (!LOGIC_FLAG)
+				{
+					LOGIC_FLAG = 1;
+					next_state = 0;
+				}
+				//B1_count[4]++;
 				// 按下按键5
 			}
 			else if ((B1 & 0x10) == 0x10 && (DataRe.data[BOT1] & 0x10) == 0)
@@ -175,7 +180,12 @@ void CAL_MESSAGE(void)
 
 			if ((B1 & 0x20) == 0 && (DataRe.data[BOT1] & 0x20) == 0x20)
 			{
-				B1_count[5]++;
+				if (!LOGIC_FLAG)
+				{
+					LOGIC_FLAG = 1;
+					next_state = 7;
+				}
+				//B1_count[5]++;
 				// 按下按键6
 			}
 			else if ((B1 & 0x20) == 0x20 && (DataRe.data[BOT1] & 0x20) == 0)
@@ -185,7 +195,7 @@ void CAL_MESSAGE(void)
 
 			if ((B1 & 0x40) == 0 && (DataRe.data[BOT1] & 0x40) == 0x40)
 			{
-				B1_count[6]++;
+				//B1_count[6]++;
 				// 按下按键7
 			}
 			else if ((B1 & 0x40) == 0x40 && (DataRe.data[BOT1] & 0x40) == 0)
@@ -195,7 +205,7 @@ void CAL_MESSAGE(void)
 
 			if ((B1 & 0x80) == 0 && (DataRe.data[BOT1] & 0x80) == 0x80)
 			{
-				B1_count[7]++;
+				//B1_count[7]++;
 				// 按下按键8
 			}
 			else if ((B1 & 0x80) == 0x80 && (DataRe.data[BOT1] & 0x80) == 0)

@@ -133,6 +133,10 @@ MotorExtentTypeDef motorExtent = {
     .state = 0xab,
 };
 
+/* Upper Feedback UART */
+int buff_len;
+char TransmitBuffer[100];
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -144,10 +148,10 @@ MotorExtentTypeDef motorExtent = {
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
+/* Definitions for chassisTask */
+osThreadId_t chassisTaskHandle;
+const osThreadAttr_t chassisTask_attributes = {
+  .name = "chassisTask",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
@@ -165,10 +169,10 @@ const osThreadAttr_t clampTask_attributes = {
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
-/* Definitions for clampPIDTask */
-osThreadId_t clampPIDTaskHandle;
-const osThreadAttr_t clampPIDTask_attributes = {
-  .name = "clampPIDTask",
+/* Definitions for upperFeedbackTa */
+osThreadId_t upperFeedbackTaHandle;
+const osThreadAttr_t upperFeedbackTa_attributes = {
+  .name = "upperFeedbackTa",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
@@ -252,10 +256,10 @@ void STOP(void)
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
+void StartChassisTask(void *argument);
 void StartBallTask(void *argument);
 void StartClampTask(void *argument);
-void StartClampPIDTask(void *argument);
+void StartUpperFeedbackTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -286,8 +290,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* creation of chassisTask */
+  chassisTaskHandle = osThreadNew(StartChassisTask, NULL, &chassisTask_attributes);
 
   /* creation of ballTask */
   ballTaskHandle = osThreadNew(StartBallTask, NULL, &ballTask_attributes);
@@ -295,8 +299,8 @@ void MX_FREERTOS_Init(void) {
   /* creation of clampTask */
   clampTaskHandle = osThreadNew(StartClampTask, NULL, &clampTask_attributes);
 
-  /* creation of clampPIDTask */
-  clampPIDTaskHandle = osThreadNew(StartClampPIDTask, NULL, &clampPIDTask_attributes);
+  /* creation of upperFeedbackTa */
+  upperFeedbackTaHandle = osThreadNew(StartUpperFeedbackTask, NULL, &upperFeedbackTa_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -308,16 +312,16 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_StartChassisTask */
 /**
- * @brief  Function implementing the defaultTask thread.
+ * @brief  Function implementing the chassisTask thread.
  * @param  argument: Not used
  * @retval None
  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_StartChassisTask */
+void StartChassisTask(void *argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
+  /* USER CODE BEGIN StartChassisTask */
   /* Infinite loop */
   for (;;)
   {
@@ -374,69 +378,45 @@ void StartDefaultTask(void *argument)
       }
     }
 
-    /* 遥控器断连停�??
-       factor1[0]++;
+    factor1[0]++;
 
-       if (receivefactor[0] == 0) // 没接收到就增加标志位
-         factor[0]++;
-       if (factor[0] > 300)
-       {
-         Vx = 0;
-         Vy = 0;
-         omega = 0;
+    if (receivefactor[0] == 0) // æ²¡æ¥æ¶å°å°±å¢å æ å¿ä½
+      factor[0]++;
+    if (factor[0] > 300)
+    {
+      Vx = 0;
+      Vy = 0;
+      omega = 0;
 
-         rx = 0;
-         ry = 0;
-         lx = 0;
-         ly = 0;
-         factor[0] = 301;
-       } // 1s没收到就全部停下
-       if (receivefactor[0] == 1) // 接收到就标志位置0
-         factor[0] = 0;
+      rx = 0;
+      ry = 0;
+      lx = 0;
+      ly = 0;
+      factor[0] = 301;
+    } 
+    if (receivefactor[0] == 1) 
+      factor[0] = 0;
 
-       if (factor1[0] == 50)
-       {
-         receivefactor[0] = 0; // 0.05s更新1次确定为没接收到
-         factor1[0] = 0;
-       }
-    */
+    if (factor1[0] == 50)
+    {
+      receivefactor[0] = 0; 
+      factor1[0] = 0;
+    }
 
-    /* 上位机断连停�??
-        factor1[1]++;
-
-        if (receivefactor[1] == 0) // 没接收到就增加标志位
-          factor[1]++;
-        if (factor[1] > 300)
-        {
-          Vx = 0;
-          Vy = 0;
-          omega = 0;
-          factor[1] = 301;
-        } // 1s没收到就全部停下
-        if (receivefactor[1] == 1) // 接收到就标志位置0
-          factor[1] = 0;
-
-        if (factor1[1] == 50)
-        {
-          receivefactor[1] = 0; // 0.05s更新1次确定为没接收到
-          factor1[1] = 0;
-        }
-    */
-
-    HAL_IWDG_Refresh(&hiwdg); // 喂狗
+    HAL_IWDG_Refresh(&hiwdg); 
 
     /* SPD TEST */
 
     get_msgn();
 
     set_mode(VEL, VEL, VEL, VEL, VEL, VEL, VEL,
-             ANG, ANG, ANG, VEL, VEL, VEL, VEL); 
+             ANG, ANG, ANG, ANG, VEL, VEL, VEL);
 
-    // ctrlmotor(temp_Vx, temp_Vy, temp_omega);
-     ctrlmotor(Vx, Vy, omega);
+    ctrlmotor(Vx, Vy, omega);
     osDelay(1);
   }
-  /* USER CODE END StartDefaultTask */
+
+  /* USER CODE END StartChassisTask */
 }
 
 /* USER CODE BEGIN Header_StartBallTask */
@@ -525,23 +505,25 @@ void StartClampTask(void *argument)
   /* USER CODE END StartClampTask */
 }
 
-/* USER CODE BEGIN Header_StartClampPIDTask */
+/* USER CODE BEGIN Header_StartUpperFeedbackTask */
 /**
- * @brief Function implementing the clampPIDTask thread.
+ * @brief Function implementing the upperFeedbackTa thread.
  * @param argument: Not used
  * @retval None
  */
-/* USER CODE END Header_StartClampPIDTask */
-void StartClampPIDTask(void *argument)
+/* USER CODE END Header_StartUpperFeedbackTask */
+void StartUpperFeedbackTask(void *argument)
 {
-  /* USER CODE BEGIN StartClampPIDTask */
+  /* USER CODE BEGIN StartUpperFeedbackTask */
   /* Infinite loop */
   for (;;)
   {
+    buff_len = sprintf(TransmitBuffer, "fg %d %d %d %d %d %d %d %d\r\n", motor_data[0]->speed_rpm, motor_data[1]->speed_rpm, motor_data[2]->speed_rpm, motor_data[3]->speed_rpm, (int)rtU.yaw_target_CH1_1, (int)rtU.yaw_target_CH1_2, (int)rtU.yaw_target_CH1_3, (int)rtU.yaw_target_CH1_4);
+    HAL_UART_Transmit_DMA(&huart2, (uint8_t *)TransmitBuffer, buff_len);
 
     osDelay(1);
   }
-  /* USER CODE END StartClampPIDTask */
+  /* USER CODE END StartUpperFeedbackTask */
 }
 
 /* Private application code --------------------------------------------------*/
