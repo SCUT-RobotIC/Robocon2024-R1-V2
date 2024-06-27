@@ -189,7 +189,7 @@ void Set_servo(TIM_HandleTypeDef *htim, uint32_t Channel, uint8_t angle, uint32_
   }
 }
 
-void R1_Ball_ON(void)
+void BALL_On(void)
 {
   ROLL_ANG = 0;
   GIVE_ANG = 26;
@@ -200,7 +200,7 @@ void R1_Ball_ON(void)
   LIFT_TGT = -14000;
 }
 
-void R1_BALL_STEP(void)
+void BALL_Step(void)
 {
   ROLL_ANG = 120;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
@@ -210,11 +210,11 @@ void R1_BALL_STEP(void)
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   HAL_Delay(1000);
 
-  R1_Ball_ON();
+  BALL_On();
 }
 
 
-void STOP(void)
+void BALL_Stop(void)
 {
   SHOOT_UP_TGT = 0;
   SHOOT_DOWN_TGT = 0;
@@ -223,11 +223,10 @@ void STOP(void)
   LIFT_TGT = 0;
   ROLL_ANG = ROLL_init;
   GIVE_ANG = GIVE_init;
-  // CAN_cmd_chassis(0, 0, 0, 0);
+
   output[CH1_5] = 0;
   output[CH1_6] = 0;
   output[CH1_7] = 0;
-  output[CH2_7] = 0;
   CAN1_cmd_chassis(output[CH1_1], output[CH1_2], output[CH1_3], output[CH1_4], output[CH1_5], output[CH1_6], output[CH1_7], 0);
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_init, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_init, 20000, 20);
@@ -411,48 +410,30 @@ void StartBallTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    // rtU.yaw_target4 = SHOOT_UP_TGT;
-    // rtU.yaw_speed_rpm4 = motor_data[4]->speed_rpm;
+    rtU.yaw_target_CH1_4 = LIFT_TGT;
+    rtU.yaw_target_CH1_5 = -SHOOT_DOWN_TGT;
+    rtU.yaw_target_CH1_6 = SHOOT_DOWN_TGT;
 
-    // rtU.yaw_target5 = -SHOOT_DOWN_TGT;
-    // rtU.yaw_target6 = SHOOT_DOWN_TGT;
 
-    // rtU.yaw_speed_rpm5 = motor_data[5]->speed_rpm;
-    // rtU.yaw_speed_rpm6 = motor_data[6]->speed_rpm;
+    switch (BUTTON_State)
+    {
 
-    // rtU.yaw_target7 = LIFT_TGT;
-    // rtU.yaw_speed_rpm7 = motor_data[7]->speed_rpm;
+    case 1:
+      // Emergency Stop
+      BALL_Stop();
+      break;
 
-    // output[4] = rtY.yaw_SPD_OUT4;
-    // output[5] = rtY.yaw_SPD_OUT5;
-    // output[6] = rtY.yaw_SPD_OUT6;
-    // output[7] = rtY.yaw_SPD_OUT7;
+    case 2:
+      // R1 Ball ON
+      BALL_On();
+      break;
 
-    // CAN1_cmd_chassis(output[0], output[1], output[2], output[3], output[4], output[5], output[6], output[7]);
-
-    // motor_state_update();
-    // __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, temp_compare_value1);
-    // __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, temp_compare_value2);
-
-    // switch (temp_BUTTON_State)
-    // {
-
-    // case 1:
-    //   // Emergency Stop
-    //   STOP();
-    //   break;
-
-    // case 2:
-    //   // R1 Ball ON
-    //   R1_BALL_STEP();
-    //   break;
-
-    // case 3:
-    //   LIFT_TGT = 8000;
-    //   break;
-    // default:
-    //   break;
-    // }
+    case 3:
+      BALL_Step();
+      break;
+    default:
+      break;
+    }
     osDelay(1);
   }
   /* USER CODE END StartBallTask */

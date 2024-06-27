@@ -156,21 +156,24 @@ void CAL_MESSAGE(void)
 			if ((B1 & 0x10) == 0 && (DataRe.data[BOT1]) == 0x10)
 			{
 				B1_count[4]++;
-				// 按下按键5
+				// 按下按键5, 球发射暂停
+				BUTTON_State = 1;
 			}
 
 
 			if ((B1 & 0x20) == 0 && (DataRe.data[BOT1]) == 0x20)
 			{
 				B1_count[5]++;
-				// 按下按键6
+				// 按下按键6，球发射上膛
+				BUTTON_State = 2;
 			}
 
 
 			if ((B1 & 0x40) == 0 && (DataRe.data[BOT1]) == 0x40)
 			{
 				B1_count[6]++;
-				// 按下按键7
+				// 按下按键7，球发射
+				BUTTON_State = 3;
 			}
 
 

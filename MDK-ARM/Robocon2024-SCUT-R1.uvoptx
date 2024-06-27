@@ -305,37 +305,22 @@
         <Ww>
           <count>11</count>
           <WinNumber>2</WinNumber>
-          <ItemText>motor_data1[3],0x0A</ItemText>
+          <ItemText>B1_count,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>2</WinNumber>
-          <ItemText>output[10]</ItemText>
+          <ItemText>BUTTON_State</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>2</WinNumber>
-          <ItemText>output[9]</ItemText>
+          <ItemText>output[1]</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>2</WinNumber>
-          <ItemText>rtU.yaw_target_CH2_4</ItemText>
-        </Ww>
-        <Ww>
-          <count>15</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>rtU.yaw_target_CH2_3</ItemText>
-        </Ww>
-        <Ww>
-          <count>16</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>rtP.ANG_S_P_CH2_4</ItemText>
-        </Ww>
-        <Ww>
-          <count>17</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>B1_count,0x0A</ItemText>
+          <ItemText>output[3]</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>
