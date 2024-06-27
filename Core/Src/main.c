@@ -63,11 +63,14 @@ int receivefactor[2];
 int factor[2] = {0};
 int factor1[2] = {0};
 
-uint8_t next_state = 0;
-uint8_t current_state;
+claw_enum next_state = IDLE_CLAW;
+claw_enum current_state = IDLE_CLAW;
+place_enum next_place = IDLE_PLACE;
+bool_T HIGH_TROQUE_TRANS_FLAG = off;
+
 double theta[4];
-uint8_t servo_flag = 0;
-uint8_t servo_state = 0;
+bool_T claw_flag = off;
+claw_enum claw_state = IDLE_CLAW;
 
 DataPacket DataRe;
 int16_t lx, ly, rx, ry, lp, rp;
@@ -81,8 +84,6 @@ uint8_T BUTTON_State = 0;
 extern int can_output[8];
 extern uint8_t data[10];
 double TEST_ANG[2] = {0, 0};
-uint8_t test_count1 = 0;
-uint8_t test_count2 = 0;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -192,7 +193,7 @@ int main(void)
   rtP.DEADBAND_CH2_4 = 800;
 
   HAL_Delay(500);
-  YAW_TGT[M_3508] = 0;
+  YAW_TGT[M_3508_R] = 0;
   YAW_TGT[M_3508_L] = 0;
   motorExtent.state = 0xab;
 
@@ -306,7 +307,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     HAL_UART_Receive_DMA(&huart2, aRxBuffer2, 1);
     if (USART2_RX_STA > USART_REC_LEN)
       USART2_RX_STA = 0;                                                              //
-    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �??????测包头包尾以及数据包长度
+    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �??????测包头包尾以及数据包长度
     {
       Receive();
       receivefactor[1] = 1;
@@ -375,43 +376,41 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       }
       else
       {
-        HIGH_TROQUE_TRANS_FLAG = 0;
+        HIGH_TROQUE_TRANS_FLAG = off;
       }
     }
 
-    if (servo_flag)
+    if (claw_flag)
     {
-      switch (servo_state)
+      switch (claw_state)
       {
-      case 1:
+      case state_claw_catch:
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
-        // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
         break;
-      case 2:
+      case state_claw_place:
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
-        // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
         break;
-      case 3:
+      case state_init:
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
         break;
-      case 4:
+      case state_close:
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
         break;
       default:
         break;
       }
-      servo_state = 0;
-      servo_flag = 0;
+      claw_state = IDLE_CLAW;
+      claw_flag = off;
     }
     /* Host Machine Serial Trans */
     // HAL_UART_Transmit_DMA(&huart2, data, 10);
 
     /* CLAMP FUCTION */
     /* Right Claw 3508 */
-    ANG_TGT[M_3508] = YAW_TGT[M_3508] * 3591 * 8191 / (187 * 360);
-    rtU.yaw_target_CH2_3 = ANG_TGT[M_3508];
+    ANG_TGT[M_3508_R] = YAW_TGT[M_3508_R] * 3591 * 8191 / (187 * 360);
+    rtU.yaw_target_CH2_3 = ANG_TGT[M_3508_R];
 
     /* Left Claw 3508 */
     

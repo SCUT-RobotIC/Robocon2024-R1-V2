@@ -31,8 +31,6 @@ typedef struct struct_message
 
 // 全局变量，按键状态
 extern uint8_t BUTTON_State;
-extern uint8_t test_count1;
-extern uint8_t test_count2;
 extern uint8_t B1_count[8];
 // 结构体
 extern DataPacket DataRe;
@@ -44,8 +42,8 @@ extern uint8_t B1, B2;
 extern uint8_t Cal_Parity;
 
 // 当前状态
-extern uint8_t LOGIC_FLAG;
-extern uint8_t next_state;
+extern bool_T LOGIC_FLAG;
+extern claw_enum next_state;
 extern int button_press_count;
 
 uint8_t CalculateParity(const uint8_t *data, int dataSize);

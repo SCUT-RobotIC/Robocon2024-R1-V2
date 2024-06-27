@@ -113,8 +113,8 @@ void CAL_MESSAGE(void)
 				// 按下按键1
 				if (!LOGIC_FLAG)
 				{
-					LOGIC_FLAG = 1;
-					next_state = 1;
+					LOGIC_FLAG = on;
+					next_state = state_claw_catch;
 				}
 			}
 
@@ -125,8 +125,8 @@ void CAL_MESSAGE(void)
 				// 按下按键2
 				if (!LOGIC_FLAG)
 				{
-					LOGIC_FLAG = 1;
-					next_state = 2;
+					LOGIC_FLAG = on;
+					next_state = state_claw_place;
 				}
 			}
 
@@ -137,8 +137,8 @@ void CAL_MESSAGE(void)
 				// 按下按键3
 				if (!LOGIC_FLAG)
 				{
-					LOGIC_FLAG = 1;
-					next_state = 7;
+					LOGIC_FLAG = on;
+					next_state = state_init;
 				}
 			}
 
@@ -148,8 +148,8 @@ void CAL_MESSAGE(void)
 				// 按下按键4
 				if (!LOGIC_FLAG)
 				{
-					LOGIC_FLAG = 1;
-					next_state = 0;
+					LOGIC_FLAG = on;
+					next_state = state_close;
 				}
 			}
 
