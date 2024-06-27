@@ -1,139 +1,79 @@
 #include "new_logic.h"
 #include "i2c.h"
-///
-void handle_M_3508_UP(void)
+
+
+void claw_catch(void)
 {
-    // ANG_TAG
-    //YAW_TGT[M_3508] = 720;
-}
-
-void handle_M_3508_DOWN(void)
-{
-    // ANG_TAG
-    //YAW_TGT[M_3508] = 0;
-}
-
-void handle_FRONT_CATCH_SERVO_ON(void)
-{
-    // GPIO控制
-    servo_flag = 1;
-    servo_state = 1;
-    // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
-}
-
-void handle_FRONT_CATCH_SERVO_OFF(void)
-{
-    // GPIO控制
-    servo_flag = 1;
-    servo_state = 2;
-    // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
-}
-
-void handle_FRONT_LEN_SERVO_ON(void)
-{
-    // GPIO控制
-    // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
-}
-
-void handle_FRONT_LEN_SERVO_OFF(void)
-{
-    // GPIO控制
-    // HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
-}
-
-void handle_TRANS_ON(void)
-{
-    // SPD_TAG
-
-}
-
-void handle_TRANS_OFF(void)
-{
-    // SPD_TAG
-
-}
-
-void handle_BACK_SERVO_ON(void)
-{
-    // PWM
-}
-
-void handle_BACK_SERVO_OFF(void)
-{
-    // PWM
-}
-
-void handle_PLACE_SERVO_ON(void)
-{
-    // PWM
-}
-
-void handle_PLACE_SERVO_OFF(void)
-{
-    // PWM
-}
-
-void handle_HIGH_TORQUE(uint8_t *motorExtent)
-{
-    // I2C_TRANS
-}
-
-void task_yaw_catch(void)
-{
-    handle_FRONT_CATCH_SERVO_ON();
+    claw_flag = on;
+    claw_state = state_claw_catch;
     HAL_Delay(200);
-    YAW_TGT[M_3508] = 400;
+    YAW_TGT[M_3508_R] = 400;
     YAW_TGT[M_3508_L] = -400;
+    next_place = FST_PLACE;
 }
 
-void task_yaw_replace(void)
+void claw_place(void)
 {
-    YAW_TGT[M_3508] = 0;
-    YAW_TGT[M_3508_L] = 0;
-    HAL_Delay(500);
-    handle_FRONT_CATCH_SERVO_OFF();
+    switch (next_place){
+        case FST_PLACE:
+            YAW_TGT[M_3508_R] = 0;
+            YAW_TGT[M_3508_L] = 0;
+            HAL_Delay(500);
+            claw_flag = on;
+            claw_state = state_claw_place;
+            HAL_Delay(200);
+            YAW_TGT[M_3508_R] = 200;
+            YAW_TGT[M_3508_L] = -200;
+            next_place = SEC_PLACE;
+        break;
+        case SEC_PLACE:
+            YAW_TGT[M_3508_R] = 0;
+            YAW_TGT[M_3508_L] = 0;
+            HAL_Delay(500);
+            claw_flag = on;
+            claw_state = state_claw_place;
+            next_place = IDLE_PLACE;
+        break;
+        default:
+        break;
+    }
 }
 
 void init(void)
 {
     motorExtent.state = 0xab;
-    HIGH_TROQUE_TRANS_FLAG = 1;
+    HIGH_TROQUE_TRANS_FLAG = on;
     HAL_Delay(500);
-    YAW_TGT[M_3508] = 0;
+    YAW_TGT[M_3508_R] = 0;
     YAW_TGT[M_3508_L] = 0;
-    servo_flag = 1;
-    servo_state = 3;
+    claw_flag = on;
+    claw_state = state_init;
+    
 }
 
 void close(void)
 {
-    servo_flag = 1;
-    servo_state = 4;
+    claw_flag = on;
+    claw_state = state_close;
     motorExtent.state = 0xcd;
-    HIGH_TROQUE_TRANS_FLAG = 1;
+    HIGH_TROQUE_TRANS_FLAG = on;
     HAL_Delay(500);
-    YAW_TGT[M_3508] = 0; 
+    YAW_TGT[M_3508_R] = 0; 
     YAW_TGT[M_3508_L] = 0;
 }
 
 func_ptr func_table[] = {
     init,
-    task_yaw_catch,
-    task_yaw_replace,
-    handle_TRANS_ON,
-    handle_TRANS_OFF,
-    handle_PLACE_SERVO_ON,
-    handle_PLACE_SERVO_OFF,
-    close};
+    close,
+    claw_catch,
+    claw_place
+};
 
 void LOGIC(void)
 {
-    if (LOGIC_FLAG)
+    if (LOGIC_FLAG && next_state!=IDLE_CLAW)
     {
-        // if(current_state != next_state){
         func_table[next_state]();
-        current_state = next_state;
-        //}
-        LOGIC_FLAG = 0;
+        LOGIC_FLAG = off;
     }
 }

@@ -120,11 +120,11 @@ float test_target = 0;
 
 uint16_t HT_moto_yaw = 0;
 
-uint8_t LOGIC_FLAG = 0;
+bool_T LOGIC_FLAG = off;
 uint8_t logic_state = 0;
 uint8_t I2C_TRANS_FLAG = 0;
 uint8_t M_3508_TRANS_FLAG = 0;
-uint8_t HIGH_TROQUE_TRANS_FLAG = 0;
+
 
 uint8_t GPIO_CHANGE_STATE_1;
 uint8_t GPIO_CHANGE_STATE_2;
