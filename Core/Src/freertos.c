@@ -125,7 +125,6 @@ uint8_t logic_state = 0;
 uint8_t I2C_TRANS_FLAG = 0;
 uint8_t M_3508_TRANS_FLAG = 0;
 
-
 uint8_t GPIO_CHANGE_STATE_1;
 uint8_t GPIO_CHANGE_STATE_2;
 uint8_t GPIO_CHANGE_FLAG = 0;
@@ -151,30 +150,30 @@ char TransmitBuffer[100];
 /* Definitions for chassisTask */
 osThreadId_t chassisTaskHandle;
 const osThreadAttr_t chassisTask_attributes = {
-  .name = "chassisTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "chassisTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for ballTask */
 osThreadId_t ballTaskHandle;
 const osThreadAttr_t ballTask_attributes = {
-  .name = "ballTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "ballTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 /* Definitions for clampTask */
 osThreadId_t clampTaskHandle;
 const osThreadAttr_t clampTask_attributes = {
-  .name = "clampTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "clampTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 /* Definitions for upperFeedbackTa */
 osThreadId_t upperFeedbackTaHandle;
 const osThreadAttr_t upperFeedbackTa_attributes = {
-  .name = "upperFeedbackTa",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "upperFeedbackTa",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -184,7 +183,7 @@ void Set_servo(TIM_HandleTypeDef *htim, uint32_t Channel, uint8_t angle, uint32_
   uint16_t compare_value = 0;
   if (angle <= 180)
   {
-    compare_value = 0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90;
+    compare_value = 20000 - (0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90); // 20000-(500+angle*11.11…)
     __HAL_TIM_SET_COMPARE(htim, Channel, compare_value);
   }
 }
@@ -196,8 +195,8 @@ void BALL_On(void)
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   SHOOT_UP_TGT = 0;
-  SHOOT_DOWN_TGT = 8000;
-  LIFT_TGT = -14000;
+  SHOOT_DOWN_TGT = 8000 / 200;
+  LIFT_TGT = -14000 / 400;
 }
 
 void BALL_Step(void)
@@ -213,7 +212,6 @@ void BALL_Step(void)
   BALL_On();
 }
 
-
 void BALL_Stop(void)
 {
   SHOOT_UP_TGT = 0;
@@ -224,9 +222,9 @@ void BALL_Stop(void)
   ROLL_ANG = ROLL_init;
   GIVE_ANG = GIVE_init;
 
-  output[CH1_5] = 0;
-  output[CH1_6] = 0;
-  output[CH1_7] = 0;
+  // output[CH2_5] = 0;
+  // output[CH1_6] = 0;
+  // output[CH1_7] = 0;
   CAN1_cmd_chassis(output[CH1_1], output[CH1_2], output[CH1_3], output[CH1_4], output[CH1_5], output[CH1_6], output[CH1_7], 0);
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_init, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_init, 20000, 20);
@@ -242,11 +240,12 @@ void StartUpperFeedbackTask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
-  * @brief  FreeRTOS initialization
-  * @param  None
-  * @retval None
-  */
-void MX_FREERTOS_Init(void) {
+ * @brief  FreeRTOS initialization
+ * @param  None
+ * @retval None
+ */
+void MX_FREERTOS_Init(void)
+{
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -287,7 +286,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
-
 }
 
 /* USER CODE BEGIN Header_StartChassisTask */
@@ -371,17 +369,17 @@ void StartChassisTask(void *argument)
       lx = 0;
       ly = 0;
       factor[0] = 301;
-    } 
-    if (receivefactor[0] == 1) 
+    }
+    if (receivefactor[0] == 1)
       factor[0] = 0;
 
     if (factor1[0] == 50)
     {
-      receivefactor[0] = 0; 
+      receivefactor[0] = 0;
       factor1[0] = 0;
     }
 
-    HAL_IWDG_Refresh(&hiwdg); 
+    HAL_IWDG_Refresh(&hiwdg);
 
     /* SPD TEST */
 
@@ -410,10 +408,9 @@ void StartBallTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    rtU.yaw_target_CH1_4 = LIFT_TGT;
-    rtU.yaw_target_CH1_5 = -SHOOT_DOWN_TGT;
-    rtU.yaw_target_CH1_6 = SHOOT_DOWN_TGT;
-
+    rtU.yaw_target_CH2_5 = LIFT_TGT;
+    rtU.yaw_target_CH1_6 = -SHOOT_DOWN_TGT;
+    rtU.yaw_target_CH1_7 = SHOOT_DOWN_TGT;
 
     switch (BUTTON_State)
     {
@@ -490,4 +487,3 @@ void StartUpperFeedbackTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-
