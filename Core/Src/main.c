@@ -40,6 +40,7 @@
 #include "delay.h"
 #include "solve.h"
 #include "new_logic.h"
+#include "sbus.h"
 
 /* USER CODE END Includes */
 
@@ -57,7 +58,10 @@ typedef struct __FILE FILE;
 uint8_t USART2_RX_BUF[USART_REC_LEN];
 uint16_t USART2_RX_STA = 0;
 uint8_t aRxBuffer2[RXBUFFERSIZE];
-UART_HandleTypeDef UART2_Handler;
+
+uint8_t USART6_RX_BUF[USART_REC_LEN];
+uint16_t USART6_RX_STA = 0;
+uint8_t aRxBuffer6[RXBUFFERSIZE];
 
 int receivefactor[2];
 int factor[2] = {0};
@@ -110,9 +114,9 @@ void MX_FREERTOS_Init(void);
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
 
@@ -146,12 +150,13 @@ int main(void)
   MX_CAN2_Init();
   MX_USART2_UART_Init();
   MX_TIM5_Init();
-  MX_TIM3_Init();
   MX_I2C1_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
   // Controler Receive Init
   HAL_UART_Receive_DMA(&huart3, (uint8_t *)&DataRe, 1);
   HAL_UART_Receive_DMA(&huart2, aRxBuffer2, 1);
+  HAL_UART_Receive_DMA(&huart6, aRxBuffer6, 1);
 
   // MATLAB Init
   PID_MODEL_initialize();
@@ -233,23 +238,23 @@ int main(void)
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-   */
+  */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_HSE;
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -264,8 +269,9 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -303,25 +309,24 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
   }
 
-  while (huart->Instance == USART2) // uart2 ?
+  while (huart->Instance == USART2)
   {
     USART2_RX_BUF[USART2_RX_STA] = aRxBuffer2[0];
     if (USART2_RX_STA == 0 && USART2_RX_BUF[USART2_RX_STA] != 0x0F)
     {
       HAL_UART_Receive_DMA(&huart2, aRxBuffer2, 1);
-      break; //
+      break;
     }
     USART2_RX_STA++;
     HAL_UART_Receive_DMA(&huart2, aRxBuffer2, 1);
     if (USART2_RX_STA > USART_REC_LEN)
       USART2_RX_STA = 0;                                                              //
-    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �??????测包头包尾以及数据包长度
+    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �????????测包头包尾以及数据包长度
     {
       Receive();
       receivefactor[1] = 1;
       Reach_TGT();
-      //			for(int i=0;i<14;i++)
-      //			  USART2_RX_BUF[i] = 0;//清除数据
+
       USART2_RX_STA = 0;
     }
     else if (!(USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA) && USART2_RX_STA == 16)
@@ -329,6 +334,37 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
       for (int i = 0; i < 16; i++)
         USART2_RX_BUF[i] = 0; // 清除数据
       USART2_RX_STA = 0;
+    }
+
+    break;
+  }
+
+  while (huart->Instance == USART6)
+  {
+    USART6_RX_BUF[USART6_RX_STA] = aRxBuffer6[0];
+    if (USART6_RX_STA == 0 && USART6_RX_BUF[USART6_RX_STA] != 0x0F)
+    {
+      HAL_UART_Receive_DMA(&huart6, aRxBuffer6, 1);
+      break; //
+    }
+    USART6_RX_STA++;
+    HAL_UART_Receive_DMA(&huart6, aRxBuffer6, 1);
+    if (USART6_RX_STA > USART_REC_LEN)
+      USART6_RX_STA = 0;
+    if (USART6_RX_BUF[0] == 0x0F && USART6_RX_BUF[24] == 0x00 && USART6_RX_STA == 25)
+    {
+      update_sbus(USART6_RX_BUF);
+      for (int i = 0; i < 25; i++)
+      {
+        USART6_RX_BUF[i] = 0;
+      }
+      USART6_RX_STA = 0;
+    }
+    else if (!(USART6_RX_BUF[0] == 0x0F && USART6_RX_BUF[24] == 0x00) && USART6_RX_STA == 25)
+    {
+      for (int i = 0; i < 25; i++)
+        USART6_RX_BUF[i] = 0; // 清除数据
+      USART6_RX_STA = 0;
     }
 
     break;
@@ -352,25 +388,26 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 /* USER CODE END 4 */
 
 /**
- * @brief  Period elapsed callback in non blocking mode
- * @note   This function is called  when TIM4 interrupt took place, inside
- * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
- * a global variable "uwTick" used as application time base.
- * @param  htim : TIM handle
- * @retval None
- */
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM4 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM4)
-  {
+  if (htim->Instance == TIM4) {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
   if (htim == &htim10)
   {
+    
+    
     if (HIGH_TROQUE_TRANS_FLAG)
     {
       if (HAL_I2C_Master_Transmit_DMA(&hi2c1, (uint16_t)I2C_SLAVE_ADDRESS, (uint8_t *)&motorExtent, sizeof(motorExtent)) != HAL_OK)
@@ -394,18 +431,32 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       switch (claw_state)
       {
       case state_claw_catch:
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+        CLAW_CH1_CH3_ON;
+        CLAW_CH2_CH4_ON;
         break;
       case state_claw_place:
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+        switch (next_place){
+          case FST_PLACE:
+            CLAW_CH1_CH3_OFF;
+            next_place = SEC_PLACE;
+          break;
+          case SEC_PLACE:
+            CLAW_CH2_CH4_OFF;
+            next_place = IDLE_PLACE;
+          break;
+          default:
+          break;
+        }
         break;
       case state_init:
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);
+        STR_ON;
+        CLAW_CH1_CH3_OFF;
+        CLAW_CH2_CH4_OFF;
         break;
       case state_close:
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
-        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_RESET);
+        STR_OFF;
+        CLAW_CH1_CH3_ON;
+        CLAW_CH2_CH4_ON;
         break;
       default:
         break;
@@ -426,6 +477,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     ANG_TGT[M_3508_L] = YAW_TGT[M_3508_L] * 3591 * 8191 / (187 * 360);
     rtU.yaw_target_CH2_4 = ANG_TGT[M_3508_L];
 
+    // Model airplane remote control test
+    // LY = SBUS_CH.CH2 - MR_CH2;
+    // RX = SBUS_CH.CH1 - MR_CH1;
+    // LX = SBUS_CH.CH4 - ML_CH4;
+
+
     assign_output();
     PID_MODEL_step();
     motor_state_update();
@@ -435,9 +492,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 }
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -449,14 +506,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */

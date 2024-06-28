@@ -24,7 +24,7 @@ void claw_place(void)
             HAL_Delay(200);
             YAW_TGT[M_3508_R] = 200;
             YAW_TGT[M_3508_L] = -200;
-            next_place = SEC_PLACE;
+            //next_place = SEC_PLACE;
         break;
         case SEC_PLACE:
             YAW_TGT[M_3508_R] = 0;
@@ -32,7 +32,7 @@ void claw_place(void)
             HAL_Delay(500);
             claw_flag = on;
             claw_state = state_claw_place;
-            next_place = IDLE_PLACE;
+            //next_place = IDLE_PLACE;
         break;
         default:
         break;

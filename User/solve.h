@@ -23,9 +23,13 @@ typedef struct
 
 	int16_t xlast;
 	int16_t ylast;
+	int16_t xll;
+	int16_t yll;
 
 	int16_t RE_theta;
 	int16_t dist;
+	int16_t distlast;
+	int16_t distll;
 	int16_t Vx;
 	int16_t Vy;
 	int16_t omega;
