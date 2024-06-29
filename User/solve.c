@@ -8,7 +8,7 @@ uint8_t data[10];
 
 double factors1 = 2;
 double factors2 = 30;
-double por=2.5;
+double por = 2.5;
 
 double deadband = 50;
 double top = 4000;
@@ -19,35 +19,35 @@ void Receive()
   RC.x = (USART2_RX_BUF[2] << 8) | USART2_RX_BUF[1];
   RC.y = (USART2_RX_BUF[4] << 8) | USART2_RX_BUF[3];
   RC.theta = (USART2_RX_BUF[6] << 8) | USART2_RX_BUF[5];
-	
-	RC.xll=RC.xlast;
-	RC.yll=RC.ylast;
-	
+
+  RC.xll = RC.xlast;
+  RC.yll = RC.ylast;
+
   RC.xlast = RC.x;
   RC.ylast = RC.y;
 
-//  TC.x = (USART2_RX_BUF[8] << 8) | USART2_RX_BUF[7];
-//  TC.y = (USART2_RX_BUF[10] << 8) | USART2_RX_BUF[9];
-//  TC.theta = (USART2_RX_BUF[12] << 8) | USART2_RX_BUF[11];
+  TC.x = (USART2_RX_BUF[8] << 8) | USART2_RX_BUF[7];
+  TC.y = (USART2_RX_BUF[10] << 8) | USART2_RX_BUF[9];
+  TC.theta = (USART2_RX_BUF[12] << 8) | USART2_RX_BUF[11];
 
   RC.action = (USART2_RX_BUF[14] << 8) | USART2_RX_BUF[13];
 }
 void Reach_TGT()
 {
-	RC.distll=RC.distlast;
-	RC.distlast=RC.dist;
+  RC.distll = RC.distlast;
+  RC.distlast = RC.dist;
   RC.dist = sqrt(pow(TC.y - RC.y, 2) + pow((TC.x - RC.x), 2));
   TC.XYtheta = atan2(TC.y - RC.y, TC.x - RC.x) * 180 / PI;
 
   if (fabs((double)RC.dist) >= deadband && fabs((double)RC.dist) < 1000)
   {
-		factors1=2;
+    factors1 = 2;
     RC.dist = 1000 / factors1;
   }
-	else if(fabs((double)RC.dist) >1000)
-	{
-		factors1=4;
-	}
+  else if (fabs((double)RC.dist) > 1000)
+  {
+    factors1 = 4;
+  }
   if (fabs((double)RC.dist) > top)
   {
 
@@ -59,14 +59,16 @@ void Reach_TGT()
   {
     RC.RE_theta = 0;
   }
-  if (fabs((double)RC.dist) < deadband||fabs(TC.theta - RC.theta)>10)
+  if (fabs((double)RC.dist) < deadband || fabs(TC.theta - RC.theta) > 10)
   {
-		RC.Vx=0;
-		RC.Vy=0;
-  }else{
-  RC.Vx = ((RC.dist+(RC.dist-RC.distlast)*por) * cos(RC.RE_theta * PI / 180)) * factors1;
-  RC.Vy = ((RC.dist+(RC.dist-RC.distlast)*por) * sin(RC.RE_theta * PI / 180)) * factors1;
-	}
+    RC.Vx = 0;
+    RC.Vy = 0;
+  }
+  else
+  {
+    RC.Vx = ((RC.dist + (RC.dist - RC.distlast) * por) * cos(RC.RE_theta * PI / 180)) * factors1;
+    RC.Vy = ((RC.dist + (RC.dist - RC.distlast) * por) * sin(RC.RE_theta * PI / 180)) * factors1;
+  }
 
   if (TC.theta - RC.theta > 181)
     TC.theta = TC.theta - 360;
