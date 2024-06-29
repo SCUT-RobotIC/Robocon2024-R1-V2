@@ -31,6 +31,7 @@ uint8_t update_sbus(uint8_t *buf)
     else 
     {
         SBUS_CH.ConnectState = 0;
+
         return 0;
     }
 }

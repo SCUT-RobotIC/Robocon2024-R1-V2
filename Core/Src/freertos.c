@@ -196,21 +196,21 @@ void BALL_On(void)
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   SHOOT_UP_TGT = 0;
-  SHOOT_DOWN_TGT = 8000 / 200;
-  LIFT_TGT = -14000 / 400;
+  SHOOT_DOWN_TGT = 8000 / 2;
+  LIFT_TGT = -16300;
 }
 
 void BALL_Step(void)
 {
   ROLL_ANG = 120;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
-  HAL_Delay(1000);
+  HAL_Delay(3000);
 
   GIVE_ANG = 80;
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   HAL_Delay(1000);
 
-  BALL_On();
+  // BALL_On();
 }
 
 void BALL_Stop(void)
@@ -311,13 +311,29 @@ void StartChassisTask(void *argument)
     }
     else if (SWITCH_LB_State == 0)
     {
+
+      if (SBUS_CH.ConnectState == 0)
+      {
+        SBUS_LY = 0;
+        SBUS_RX = 0;
+        SBUS_LX = 0;
+      }
+      else if (SBUS_CH.ConnectState == 1)
+      {
+        SBUS_LY = 10 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 10 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 10 * (SBUS_CH.CH4 - ML_CH4);
+      }
+
+      // Self-made controller
       Vx = rx / 9;
       Vy = ry / 9;
       omega = lx / 9;
 
-      SBUS_LY = SBUS_CH.CH2 - MR_CH2;
-      SBUS_RX = SBUS_CH.CH1 - MR_CH1;
-      SBUS_LX = SBUS_CH.CH4 - ML_CH4;
+      // Model controller
+      // Vx = SBUS_LX;
+      // Vy = SBUS_LY;
+      // omega = SBUS_RX;
 
       if (Vx > Controller_Deadband)
       {
@@ -413,7 +429,7 @@ void StartBallTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    rtU.yaw_target_CH2_5 = LIFT_TGT;
+    rtU.yaw_target_CH1_5 = LIFT_TGT;
     rtU.yaw_target_CH1_6 = -SHOOT_DOWN_TGT;
     rtU.yaw_target_CH1_7 = SHOOT_DOWN_TGT;
 
@@ -432,6 +448,7 @@ void StartBallTask(void *argument)
 
     case 3:
       BALL_Step();
+      BUTTON_State = 2;
       break;
     default:
       break;

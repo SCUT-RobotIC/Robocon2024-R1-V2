@@ -189,7 +189,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim5, TIM_CHANNEL_2);
 
   // Ball PID Init
-  PID_Speed_Para_Init(2, 5, 2, 0.7, 0.1);
+  PID_Speed_Para_Init(1, 5, 2, 0.7, 0.1);
   PID_Speed_Para_Init(1, 6, 2, 0.7, 0.1);
   PID_Speed_Para_Init(1, 7, 2, 0.7, 0.1);
 
