@@ -2,6 +2,8 @@
 
 SBUS_CH_Struct SBUS_CH;
 
+int SBUS_LY, SBUS_LX, SBUS_RX;
+
 uint8_t update_sbus(uint8_t *buf)
 {
     if (buf[23] == 0)

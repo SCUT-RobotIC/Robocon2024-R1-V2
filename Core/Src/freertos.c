@@ -69,14 +69,6 @@ extern int16_t lx, ly, rx, ry, lp, rp;
 extern uint8_t B1, B2;
 extern uint8_t Cal_Parity;
 
-int LY, LX, RX = 0;
-
-int ML_CH3 =  1224  ; // left_spd
-int ML_CH4 =  1057 ; // rotate 
-int MR_CH2 =  987 ; //  right_y  max 1400 min 600
-int MR_CH1 =  931 ;  // right_x
-
-
 extern uint8_t BUTTON_State;
 extern uint8_t SWITCH_LF_State;
 extern uint8_t SWITCH_LB_State;
@@ -159,30 +151,30 @@ char TransmitBuffer[100];
 /* Definitions for chassisTask */
 osThreadId_t chassisTaskHandle;
 const osThreadAttr_t chassisTask_attributes = {
-  .name = "chassisTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "chassisTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for ballTask */
 osThreadId_t ballTaskHandle;
 const osThreadAttr_t ballTask_attributes = {
-  .name = "ballTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "ballTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 /* Definitions for clampTask */
 osThreadId_t clampTaskHandle;
 const osThreadAttr_t clampTask_attributes = {
-  .name = "clampTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "clampTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 /* Definitions for upperFeedbackTa */
 osThreadId_t upperFeedbackTaHandle;
 const osThreadAttr_t upperFeedbackTa_attributes = {
-  .name = "upperFeedbackTa",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "upperFeedbackTa",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -249,11 +241,12 @@ void StartUpperFeedbackTask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
-  * @brief  FreeRTOS initialization
-  * @param  None
-  * @retval None
-  */
-void MX_FREERTOS_Init(void) {
+ * @brief  FreeRTOS initialization
+ * @param  None
+ * @retval None
+ */
+void MX_FREERTOS_Init(void)
+{
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -294,7 +287,6 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
-
 }
 
 /* USER CODE BEGIN Header_StartChassisTask */
@@ -323,7 +315,9 @@ void StartChassisTask(void *argument)
       Vy = ry / 9;
       omega = lx / 9;
 
-
+      SBUS_LY = SBUS_CH.CH2 - MR_CH2;
+      SBUS_RX = SBUS_CH.CH1 - MR_CH1;
+      SBUS_LX = SBUS_CH.CH4 - ML_CH4;
 
       if (Vx > Controller_Deadband)
       {
@@ -498,4 +492,3 @@ void StartUpperFeedbackTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-

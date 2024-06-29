@@ -380,17 +380,17 @@
         <Ww>
           <count>23</count>
           <WinNumber>2</WinNumber>
-          <ItemText>RX</ItemText>
+          <ItemText>SBUS_RX,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>24</count>
           <WinNumber>2</WinNumber>
-          <ItemText>LX</ItemText>
+          <ItemText>SBUS_LX,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>25</count>
           <WinNumber>2</WinNumber>
-          <ItemText>LY</ItemText>
+          <ItemText>SBUS_LY,0x0A</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>
