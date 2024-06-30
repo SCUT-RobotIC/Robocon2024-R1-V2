@@ -75,14 +75,13 @@ extern uint8_t SWITCH_LB_State;
 extern uint8_t SWITCH_RF_State;
 extern uint8_t SWITCH_RB_State;
 
+/* Chassis Velocity Variables */
 extern double output[16];
-
 double Vx, Vy, omega = 0;
+double V_Sum = 0;
+double V_Sum_Last = 0;
 
 /* Manual Control Temp Variables */
-double temp_Vy, temp_omega = 0;
-double temp_Vx = 0;
-uint8_t temp_BUTTON_State = 0;
 
 double Controller_Deadband = 500;
 
@@ -184,7 +183,7 @@ void Set_servo(TIM_HandleTypeDef *htim, uint32_t Channel, uint8_t angle, uint32_
   uint16_t compare_value = 0;
   if (angle <= 180)
   {
-    compare_value = 20000 - (0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90); // 20000-(500+angle*11.11�??)
+    compare_value = 20000 - (0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90); // 20000-(500+angle*11.11�???)
     __HAL_TIM_SET_COMPARE(htim, Channel, compare_value);
   }
 }
@@ -375,9 +374,24 @@ void StartChassisTask(void *argument)
       }
     }
 
+    /* Soft Speed UP */
+    // V_Sum = sqrt(Vx * Vx + Vy * Vy);
+    // if (V_Sum > 3000)
+    // {
+    //   if (fabs(V_Sum - V_Sum_Last) > 2)
+    //   {
+    //     V_Sum = V_Sum_Last + 2;
+    //   }
+    // }
+    // Vx = V_Sum * cos(atan2(Vy, Vx));
+    // Vy = V_Sum * sin(atan2(Vy, Vx));
+
+    // V_Sum_Last = V_Sum;
+
+    /* Controller Disconnection Protection */
     factor1[0]++;
 
-    if (receivefactor[0] == 0) // æ²¡æ¥æ¶å°å°±å¢å æ å¿ä½
+    if (receivefactor[0] == 0) 
       factor[0]++;
     if (factor[0] > 300)
     {
@@ -401,8 +415,6 @@ void StartChassisTask(void *argument)
     }
 
     HAL_IWDG_Refresh(&hiwdg);
-
-    /* SPD TEST */
 
     get_msgn();
 

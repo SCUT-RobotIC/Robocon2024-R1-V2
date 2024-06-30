@@ -9,10 +9,10 @@ double Deadband = 500;
 
 void ctrlmotor(double Vx, double Vy, double omega)
 {
-  while ((fabs((sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) > 8191) ||
-         (fabs((sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) > 8191) ||
-         (fabs((-sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) > 8191) ||
-         (fabs((-sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) > 8191))
+  while ((fabs((sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) > 4000) ||
+         (fabs((sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) > 4000) ||
+         (fabs((-sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) > 4000) ||
+         (fabs((-sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) > 4000))
     mult = 0.98 * mult;
   if (fabs((sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) == 0 && fabs((sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy - omega) * mult) == 0 &&
       fabs((-sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) == 0 & fabs((-sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) == 0)

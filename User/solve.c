@@ -59,7 +59,8 @@ void Reach_TGT()
   {
     RC.RE_theta = 0;
   }
-  if (fabs((double)RC.dist) < deadband || fabs(TC.theta - RC.theta) > 10)
+  if (fabs((double)RC.dist) < deadband)
+  // if (fabs((double)RC.dist) < deadband || fabs(TC.theta - RC.theta) > 10)
   {
     RC.Vx = 0;
     RC.Vy = 0;

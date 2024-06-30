@@ -321,7 +321,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     HAL_UART_Receive_DMA(&huart2, aRxBuffer2, 1);
     if (USART2_RX_STA > USART_REC_LEN)
       USART2_RX_STA = 0;                                                              //
-    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �????????测包头包尾以及数据包长度
+    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �?????????测包头包尾以及数据包长度
     {
       Receive();
       receivefactor[1] = 1;
@@ -437,11 +437,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       case state_claw_place:
         switch (next_place){
           case FST_PLACE:
-            CLAW_CH1_CH3_OFF;
+            CLAW_CH2_CH4_OFF;
+            // CLAW_CH1_CH3_OFF;
             next_place = SEC_PLACE;
           break;
           case SEC_PLACE:
-            CLAW_CH2_CH4_OFF;
+            CLAW_CH1_CH3_OFF;
+            // CLAW_CH2_CH4_OFF;
             next_place = IDLE_PLACE;
           break;
           default:
