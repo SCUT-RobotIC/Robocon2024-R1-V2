@@ -35,6 +35,7 @@
 #include "delay.h"
 #include "solve.h"
 #include "new_logic.h"
+#include "sbus.h"
 
 /* USER CODE END Includes */
 
@@ -73,17 +74,17 @@ extern uint8_t SWITCH_LF_State;
 extern uint8_t SWITCH_LB_State;
 extern uint8_t SWITCH_RF_State;
 extern uint8_t SWITCH_RB_State;
+extern int MAXVAL;
 
+/* Chassis Velocity Variables */
 extern double output[16];
-
 double Vx, Vy, omega = 0;
+double V_Sum = 0;
+double V_Sum_Last = 0;
 
 /* Manual Control Temp Variables */
-double temp_Vy, temp_omega = 0;
-double temp_Vx = 0;
-uint8_t temp_BUTTON_State = 0;
 
-double Controller_Deadband = 500;
+double Controller_Deadband = 300;
 
 /* R1 Ball Definition */
 double SHOOT_UP_TGT = 0;
@@ -101,7 +102,7 @@ REAL_COOR RC;
 const int M3508_MAX = 8911;
 const int M2006_MAX = 14976;
 
-const int ROLL_init = 150, GIVE_init = 155;
+const int ROLL_init = 120, GIVE_init = 26;
 int ROLL_ANG = ROLL_init, GIVE_ANG = GIVE_init;
 int ROLL_state = 0, GIVE_state = 0;
 
@@ -120,11 +121,10 @@ float test_target = 0;
 
 uint16_t HT_moto_yaw = 0;
 
-uint8_t LOGIC_FLAG = 0;
+bool_T LOGIC_FLAG = off;
 uint8_t logic_state = 0;
 uint8_t I2C_TRANS_FLAG = 0;
 uint8_t M_3508_TRANS_FLAG = 0;
-uint8_t HIGH_TROQUE_TRANS_FLAG = 0;
 
 uint8_t GPIO_CHANGE_STATE_1;
 uint8_t GPIO_CHANGE_STATE_2;
@@ -132,6 +132,10 @@ uint8_t GPIO_CHANGE_FLAG = 0;
 MotorExtentTypeDef motorExtent = {
     .state = 0xab,
 };
+
+/* Upper Feedback UART */
+int buff_len;
+char TransmitBuffer[100];
 
 /* USER CODE END PD */
 
@@ -144,10 +148,10 @@ MotorExtentTypeDef motorExtent = {
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-    .name = "defaultTask",
+/* Definitions for chassisTask */
+osThreadId_t chassisTaskHandle;
+const osThreadAttr_t chassisTask_attributes = {
+    .name = "chassisTask",
     .stack_size = 128 * 4,
     .priority = (osPriority_t)osPriorityNormal,
 };
@@ -165,10 +169,10 @@ const osThreadAttr_t clampTask_attributes = {
     .stack_size = 128 * 4,
     .priority = (osPriority_t)osPriorityLow,
 };
-/* Definitions for clampPIDTask */
-osThreadId_t clampPIDTaskHandle;
-const osThreadAttr_t clampPIDTask_attributes = {
-    .name = "clampPIDTask",
+/* Definitions for upperFeedbackTa */
+osThreadId_t upperFeedbackTaHandle;
+const osThreadAttr_t upperFeedbackTa_attributes = {
+    .name = "upperFeedbackTa",
     .stack_size = 128 * 4,
     .priority = (osPriority_t)osPriorityLow,
 };
@@ -180,58 +184,36 @@ void Set_servo(TIM_HandleTypeDef *htim, uint32_t Channel, uint8_t angle, uint32_
   uint16_t compare_value = 0;
   if (angle <= 180)
   {
-    compare_value = 0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90;
+    compare_value = 20000 - (0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90); // 20000-(500+angle*11.11�???)
     __HAL_TIM_SET_COMPARE(htim, Channel, compare_value);
   }
 }
 
-void R1_Ball_ON(void)
+void BALL_On(void)
 {
-  ROLL_ANG = 60;
-  GIVE_ANG = 155;
+  ROLL_ANG = 0;
+  GIVE_ANG = 26;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   SHOOT_UP_TGT = 0;
-  SHOOT_DOWN_TGT = 0;
-  LIFT_TGT = 8000;
+  SHOOT_DOWN_TGT = 8000 / 2;
+  LIFT_TGT = -16300;
 }
 
-void R1_BALL_STEP(void)
+void BALL_Step(void)
 {
-  SHOOT_UP_TGT = 3000;
-  SHOOT_DOWN_TGT = 7000;
-  ROLL_ANG = 150;
+  ROLL_ANG = 120;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
-  HAL_Delay(7000);
+  HAL_Delay(3000);
 
-  GIVE_ANG = 145;
-  Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
+  GIVE_ANG = 80;
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
-  HAL_Delay(500);
+  HAL_Delay(1000);
 
-  GIVE_ANG = 135;
-  Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
-  HAL_Delay(500);
-
-  GIVE_ANG = 120;
-  Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
-  HAL_Delay(2000);
-
-  R1_Ball_ON();
+  // BALL_On();
 }
 
-void R1_Ball_OFF(void)
-{
-  SHOOT_UP_TGT = 0;
-  SHOOT_DOWN_TGT = 0;
-  LIFT_TGT = 0;
-  ROLL_ANG = 150;
-  GIVE_ANG = 155;
-  Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
-  Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
-}
-
-void STOP(void)
+void BALL_Stop(void)
 {
   SHOOT_UP_TGT = 0;
   SHOOT_DOWN_TGT = 0;
@@ -240,22 +222,21 @@ void STOP(void)
   LIFT_TGT = 0;
   ROLL_ANG = ROLL_init;
   GIVE_ANG = GIVE_init;
-  // CAN_cmd_chassis(0, 0, 0, 0);
-  output[CH1_5] = 0;
-  output[CH1_6] = 0;
-  output[CH1_7] = 0;
-  output[CH2_7] = 0;
-  // CAN1_cmd_chassis(output[CH1_1], output[CH1_2], output[CH1_3], output[CH1_4], output[CH1_5], output[CH1_6], output[CH1_7], 0);
+
+  // output[CH2_5] = 0;
+  // output[CH1_6] = 0;
+  // output[CH1_7] = 0;
+  CAN1_cmd_chassis(output[CH1_1], output[CH1_2], output[CH1_3], output[CH1_4], output[CH1_5], output[CH1_6], output[CH1_7], 0);
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_init, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_init, 20000, 20);
 }
 
 /* USER CODE END FunctionPrototypes */
 
-void StartDefaultTask(void *argument);
+void StartChassisTask(void *argument);
 void StartBallTask(void *argument);
 void StartClampTask(void *argument);
-void StartClampPIDTask(void *argument);
+void StartUpperFeedbackTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -287,8 +268,8 @@ void MX_FREERTOS_Init(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  /* creation of chassisTask */
+  chassisTaskHandle = osThreadNew(StartChassisTask, NULL, &chassisTask_attributes);
 
   /* creation of ballTask */
   ballTaskHandle = osThreadNew(StartBallTask, NULL, &ballTask_attributes);
@@ -296,8 +277,8 @@ void MX_FREERTOS_Init(void)
   /* creation of clampTask */
   clampTaskHandle = osThreadNew(StartClampTask, NULL, &clampTask_attributes);
 
-  /* creation of clampPIDTask */
-  clampPIDTaskHandle = osThreadNew(StartClampPIDTask, NULL, &clampPIDTask_attributes);
+  /* creation of upperFeedbackTa */
+  upperFeedbackTaHandle = osThreadNew(StartUpperFeedbackTask, NULL, &upperFeedbackTa_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -308,31 +289,54 @@ void MX_FREERTOS_Init(void)
   /* USER CODE END RTOS_EVENTS */
 }
 
-/* USER CODE BEGIN Header_StartDefaultTask */
+/* USER CODE BEGIN Header_StartChassisTask */
 /**
- * @brief  Function implementing the defaultTask thread.
+ * @brief  Function implementing the chassisTask thread.
  * @param  argument: Not used
  * @retval None
  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
+/* USER CODE END Header_StartChassisTask */
+void StartChassisTask(void *argument)
 {
-  /* USER CODE BEGIN StartDefaultTask */
+  /* USER CODE BEGIN StartChassisTask */
   /* Infinite loop */
   for (;;)
   {
     CAL_TXMESSAGE();
     if (SWITCH_LB_State == 1)
     {
+			MAXVAL=8000;
       Vx = RC.Vx;
       Vy = RC.Vy;
       omega = RC.omega;
     }
     else if (SWITCH_LB_State == 0)
     {
-      Vx = rx / 9;
-      Vy = ry / 9;
-      omega = lx / 9;
+
+      if (SBUS_CH.ConnectState == 0)
+      {
+        SBUS_LY = 0;
+        SBUS_RX = 0;
+        SBUS_LX = 0;
+      }
+      else if (SBUS_CH.ConnectState == 1)
+      {
+				MAXVAL=1000;
+
+        SBUS_LY = 2 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 2 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 2 * (SBUS_CH.CH4 - ML_CH4);
+      }
+
+      // Self-made controller
+      // Vx = rx / 9;
+      // Vy = ry / 9;
+      // omega = lx / 9;
+
+      // Model controller
+      Vx = SBUS_LX;
+      Vy = SBUS_LY;
+      omega = SBUS_RX;
 
       if (Vx > Controller_Deadband)
       {
@@ -374,10 +378,24 @@ void StartDefaultTask(void *argument)
       }
     }
 
-    // 遥控器断连停�?
+    /* Soft Speed UP */
+    // V_Sum = sqrt(Vx * Vx + Vy * Vy);
+    // if (V_Sum > 3000)
+    // {
+    //   if (fabs(V_Sum - V_Sum_Last) > 2)
+    //   {
+    //     V_Sum = V_Sum_Last + 2;
+    //   }
+    // }
+    // Vx = V_Sum * cos(atan2(Vy, Vx));
+    // Vy = V_Sum * sin(atan2(Vy, Vx));
+
+    // V_Sum_Last = V_Sum;
+
+    /* Controller Disconnection Protection */
     factor1[0]++;
 
-    if (receivefactor[0] == 0) // 没接收到就增加标志位
+    if (receivefactor[0] == 0) 
       factor[0]++;
     if (factor[0] > 300)
     {
@@ -390,52 +408,28 @@ void StartDefaultTask(void *argument)
       lx = 0;
       ly = 0;
       factor[0] = 301;
-    } // 1s没收到就全部停下
-    if (receivefactor[0] == 1) // 接收到就标志位置0
+    }
+    if (receivefactor[0] == 1)
       factor[0] = 0;
 
     if (factor1[0] == 50)
     {
-      receivefactor[0] = 0; // 0.05s更新1次确定为没接收到
+      receivefactor[0] = 0;
       factor1[0] = 0;
     }
 
-    /* 上位机断连停�?
-        factor1[1]++;
-
-        if (receivefactor[1] == 0) // 没接收到就增加标志位
-          factor[1]++;
-        if (factor[1] > 300)
-        {
-          Vx = 0;
-          Vy = 0;
-          omega = 0;
-          factor[1] = 301;
-        } // 1s没收到就全部停下
-        if (receivefactor[1] == 1) // 接收到就标志位置0
-          factor[1] = 0;
-
-        if (factor1[1] == 50)
-        {
-          receivefactor[1] = 0; // 0.05s更新1次确定为没接收到
-          factor1[1] = 0;
-        }
-    */
-
-    HAL_IWDG_Refresh(&hiwdg); // 喂狗
-
-    /* SPD TEST */
+    HAL_IWDG_Refresh(&hiwdg);
 
     get_msgn();
 
     set_mode(VEL, VEL, VEL, VEL, VEL, VEL, VEL,
-             ANG, ANG, ANG, VEL, VEL, VEL, VEL);
+             ANG, ANG, ANG, ANG, VEL, VEL, VEL);
 
-    // ctrlmotor(temp_Vx, temp_Vy, temp_omega);
     ctrlmotor(Vx, Vy, omega);
     osDelay(1);
   }
-  /* USER CODE END StartDefaultTask */
+
+  /* USER CODE END StartChassisTask */
 }
 
 /* USER CODE BEGIN Header_StartBallTask */
@@ -451,39 +445,27 @@ void StartBallTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    rtU.yaw_target_CH1_5 = SHOOT_UP_TGT;
+    rtU.yaw_target_CH1_5 = LIFT_TGT;
     rtU.yaw_target_CH1_6 = -SHOOT_DOWN_TGT;
     rtU.yaw_target_CH1_7 = SHOOT_DOWN_TGT;
-
-
-    rtU.yaw_target_CH2_5 = LIFT_TGT;
-
-    // __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_1, temp_compare_value1);
-    // __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_2, temp_compare_value2);
 
     switch (BUTTON_State)
     {
 
     case 1:
       // Emergency Stop
-      STOP();
+      BALL_Stop();
       break;
 
     case 2:
       // R1 Ball ON
-      R1_BALL_STEP();
+      BALL_On();
       break;
 
     case 3:
-      LIFT_TGT = 8000;
+      BALL_Step();
+      BUTTON_State = 2;
       break;
-    
-    case 4:
-      // 备场射球临时测试
-      SHOOT_UP_TGT = 0;
-      SHOOT_DOWN_TGT = 6000;
-      break;
-
     default:
       break;
     }
@@ -518,23 +500,30 @@ void StartClampTask(void *argument)
   /* USER CODE END StartClampTask */
 }
 
-/* USER CODE BEGIN Header_StartClampPIDTask */
+/* USER CODE BEGIN Header_StartUpperFeedbackTask */
 /**
- * @brief Function implementing the clampPIDTask thread.
+ * @brief Function implementing the upperFeedbackTa thread.
  * @param argument: Not used
  * @retval None
  */
-/* USER CODE END Header_StartClampPIDTask */
-void StartClampPIDTask(void *argument)
+/* USER CODE END Header_StartUpperFeedbackTask */
+void StartUpperFeedbackTask(void *argument)
 {
-  /* USER CODE BEGIN StartClampPIDTask */
+  /* USER CODE BEGIN StartUpperFeedbackTask */
   /* Infinite loop */
   for (;;)
   {
+			if(SBUS_CH.CH6<800)
+	{
+		__disable_irq(); //鍏抽棴鎵?鏈変腑鏂? 
+		NVIC_SystemReset(); //澶嶄綅
+	}
+    buff_len = sprintf(TransmitBuffer, "fg %d %d %d %d %d %d %d %d\r\n", motor_data[0]->speed_rpm, motor_data[1]->speed_rpm, motor_data[2]->speed_rpm, motor_data[3]->speed_rpm, (int)rtU.yaw_target_CH1_1, (int)rtU.yaw_target_CH1_2, (int)rtU.yaw_target_CH1_3, (int)rtU.yaw_target_CH1_4);
+    HAL_UART_Transmit_DMA(&huart2, (uint8_t *)TransmitBuffer, buff_len);
 
     osDelay(1);
   }
-  /* USER CODE END StartClampPIDTask */
+  /* USER CODE END StartUpperFeedbackTask */
 }
 
 /* Private application code --------------------------------------------------*/

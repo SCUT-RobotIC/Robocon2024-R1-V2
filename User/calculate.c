@@ -66,7 +66,7 @@
 uint8_t SWITCH_LF_State = 0;
 uint8_t SWITCH_LB_State = 0;
 uint8_t SWITCH_RF_State = 0;
-uint8_t SWITCH_RB_State = 0; 
+uint8_t SWITCH_RB_State = 0;
 
 int16_t temp_switch = 0;
 
@@ -107,96 +107,93 @@ void CAL_MESSAGE(void)
 			rp = (rp & 0x8000) ? (rp | 0xFFFF0000) : rp;
 
 			// 按键更新
-			if ((B1 & 0x01) == 0 && (DataRe.data[BOT1] & 0x01) == 0x01)
+			if ((B1 & 0x01) == 0 && (DataRe.data[BOT1]) == 0x01)
 			{
+				B1_count[0]++;
 				// 按下按键1
-				LOGIC_FLAG=1;
-				next_state=1;
-			}
-			else if ((B1 & 0x01) == 0x01 && (DataRe.data[BOT1] & 0x01) == 0)
-			{
-				// 松开按键1
+				if (!LOGIC_FLAG)
+				{
+					LOGIC_FLAG = on;
+					next_state = state_claw_catch;
+				}
 			}
 
-			if ((B1 & 0x02) == 0 && (DataRe.data[BOT1] & 0x02) == 0x02)
+
+			if ((B1 & 0x02) == 0 && (DataRe.data[BOT1]) == 0x02)
 			{
+				B1_count[1]++;
 				// 按下按键2
-				LOGIC_FLAG=1;
-				next_state=2;
-			}
-			else if ((B1 & 0x02) == 0x02 && (DataRe.data[BOT1] & 0x02) == 0)
-			{
-				// 松开按键2
+				if (!LOGIC_FLAG)
+				{
+					LOGIC_FLAG = on;
+					next_state = state_claw_place;
+				}
 			}
 
-			if ((B1 & 0x04) == 0 && (DataRe.data[BOT1] & 0x04) == 0x04)
+
+			if ((B1 & 0x04) == 0 && (DataRe.data[BOT1]) == 0x04)
 			{
+				B1_count[2]++;
 				// 按下按键3
+				if (!LOGIC_FLAG)
+				{
+					LOGIC_FLAG = on;
+					next_state = state_init;
+				}
+			}
+
+			if ((B1 & 0x08) == 0 && (DataRe.data[BOT1]) == 0x08)
+			{
+				B1_count[3]++;
+				// 按下按键4
+				if (!LOGIC_FLAG)
+				{
+					LOGIC_FLAG = on;
+					next_state = state_close;
+				}
+			}
+
+			if ((B1 & 0x10) == 0 && (DataRe.data[BOT1]) == 0x10)
+			{
+				B1_count[4]++;
+				// 按下按键5, 球发射暂停
 				BUTTON_State = 1;
 			}
-			else if ((B1 & 0x04) == 0x04 && (DataRe.data[BOT1] & 0x04) == 0)
+
+
+			if ((B1 & 0x20) == 0 && (DataRe.data[BOT1]) == 0x20)
 			{
-				// 松开按键3
+				B1_count[5]++;
+				// 按下按键6，球发射上膛
+				BUTTON_State = 2;
 			}
 
-			if ((B1 & 0x08) == 0 && (DataRe.data[BOT1] & 0x08) == 0x08)
+
+			if ((B1 & 0x40) == 0 && (DataRe.data[BOT1]) == 0x40)
 			{
-				// 按下按键4
-				BUTTON_State = 4; // 单射球临时测试
-			}
-			else if ((B1 & 0x08) == 0x08 && (DataRe.data[BOT1] & 0x08) == 0)
-			{
-				// 松开按键4
+				B1_count[6]++;
+				// 按下按键7，球发射
+				BUTTON_State = 3;
 			}
 
-			if ((B1 & 0x10) == 0 && (DataRe.data[BOT1] & 0x10) == 0x10)
-			{
-				// 按下按键5
-			}
-			else if ((B1 & 0x10) == 0x10 && (DataRe.data[BOT1] & 0x10) == 0)
-			{
-				// 松开按键5
-			}
 
-			if ((B1 & 0x20) == 0 && (DataRe.data[BOT1] & 0x20) == 0x20)
+			if ((B1 & 0x80) == 0 && (DataRe.data[BOT1]) == 0x80)
 			{
-				// 按下按键6
-			}
-			else if ((B1 & 0x20) == 0x20 && (DataRe.data[BOT1] & 0x20) == 0)
-			{
-				// 松开按键6
-			}
-
-			if ((B1 & 0x40) == 0 && (DataRe.data[BOT1] & 0x40) == 0x40)
-			{
-				// 按下按键7
-			}
-			else if ((B1 & 0x40) == 0x40 && (DataRe.data[BOT1] & 0x40) == 0)
-			{
-				// 松开按键7
-			}
-
-			if ((B1 & 0x80) == 0 && (DataRe.data[BOT1] & 0x80) == 0x80)
-			{
+				B1_count[7]++;
 				// 按下按键8
 			}
-			else if ((B1 & 0x80) == 0x80 && (DataRe.data[BOT1] & 0x80) == 0)
-			{
-				// 松开按键8
-			}
+
 
 			// 开关更新
 			if ((B2 & 0x01) == 0 && (DataRe.data[BOT2] & 0x01) == 0x01)
 			{
 				// 开关A1开
 				SWITCH_LB_State = 1;
-				temp_switch = 1;
 			}
 			else if ((B2 & 0x01) == 0x01 && (DataRe.data[BOT2] & 0x01) == 0)
 			{
 				// 开关A1关
 				SWITCH_LB_State = 0;
-				temp_switch = 0;
 			}
 
 			if ((B2 & 0x02) == 0 && (DataRe.data[BOT2] & 0x02) == 0x02)
@@ -269,6 +266,7 @@ void CAL_MESSAGE(void)
 				// 开关D2关
 			}
 			// 更新标志位
+
 			B1 = DataRe.data[BOT1];
 			B2 = DataRe.data[BOT2];
 		}
