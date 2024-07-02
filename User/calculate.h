@@ -40,7 +40,6 @@ extern int16_t lx, ly, rx, ry, lp, rp;
 extern uint8_t B1, B2;
 // 校验位
 extern uint8_t Cal_Parity;
-
 // 当前状态
 extern bool_T LOGIC_FLAG;
 extern claw_enum next_state;

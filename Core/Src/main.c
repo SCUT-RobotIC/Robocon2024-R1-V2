@@ -221,6 +221,7 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
+	STR_OFF;
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -437,13 +438,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       case state_claw_place:
         switch (next_place){
           case FST_PLACE:
-            CLAW_CH2_CH4_OFF;
-            // CLAW_CH1_CH3_OFF;
+            // CLAW_CH2_CH4_OFF;
+            CLAW_CH1_CH3_OFF;
             next_place = SEC_PLACE;
           break;
           case SEC_PLACE:
-            CLAW_CH1_CH3_OFF;
-            // CLAW_CH2_CH4_OFF;
+            // CLAW_CH1_CH3_OFF;
+            CLAW_CH2_CH4_OFF;
             next_place = IDLE_PLACE;
           break;
           default:
