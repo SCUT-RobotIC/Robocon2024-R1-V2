@@ -5,7 +5,7 @@
 ### ESP遥控器按键/开关映射
 操作方式为日本手，与R1所使用的航模遥控器操作一致。
 ![1720112809649](https://github.com/SCUT-RobotIC/Robocon2024-R1-V2/blob/main/image/README/1720112809649.png)
-![1720112999987](https://github.com/SCUT-RobotIC/Robocon2024-R1-V2/image/README/1720112999987.png)
+![1720112999987](https://github.com/SCUT-RobotIC/Robocon2024-R1-V2/blob/main/image/README/1720112999987.png)
 
 ESP遥控器的拨杆开关根据方位有Left Behind、Left Front、Right Behind、Right Front四个，每个开关皆为三档，分别为UP、MID、DOWN，对应的映射如下：
 | 拨杆开关 | UP | MID | DOWN |
@@ -27,7 +27,7 @@ ESP遥控器的拨杆开关根据方位有Left Behind、Left Front、Right Behin
 
 ### 航模遥控器按键/开关映射
 航模遥控器为日本手，只有在双遥控器模式开启时才能启用，并且将部分ESP遥控器的功能映射到航模遥控器上，具体映射如下： 
-![1720114295422](https://github.com/SCUT-RobotIC/Robocon2024-R1-V2/image/README/1720114295422.png)
+![1720114295422](https://github.com/SCUT-RobotIC/Robocon2024-R1-V2/blob/main/image/README/1720114295422.png)
 | 拨杆开关 | UP | MID | DOWN |
 | :------: | :------: | :------: | :------: |
 | LB | 单航模遥控底盘模式 | 上位机操控模式 | 上位机操控模式 |
