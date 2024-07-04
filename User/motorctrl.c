@@ -6,13 +6,13 @@ int BrakeFlag = 0;
 int BrakeAng[4] = {0};
 double mult = 1;
 double Deadband = 500;
-
+int MAXVAL;
 void ctrlmotor(double Vx, double Vy, double omega)
 {
-  while ((fabs((sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) > 4000) ||
-         (fabs((sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) > 4000) ||
-         (fabs((-sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) > 4000) ||
-         (fabs((-sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) > 4000))
+  while ((fabs((sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) >  MAXVAL) ||
+         (fabs((sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) >  MAXVAL) ||
+         (fabs((-sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) > MAXVAL) ||
+         (fabs((-sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) > MAXVAL))
     mult = 0.98 * mult;
   if (fabs((sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) == 0 && fabs((sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy - omega) * mult) == 0 &&
       fabs((-sqrt(2) / 2 * Vx + sqrt(2) / 2 * Vy + omega) * mult) == 0 & fabs((-sqrt(2) / 2 * Vx - sqrt(2) / 2 * Vy + omega) * mult) == 0)

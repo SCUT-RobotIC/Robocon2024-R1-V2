@@ -74,6 +74,7 @@ extern uint8_t SWITCH_LF_State;
 extern uint8_t SWITCH_LB_State;
 extern uint8_t SWITCH_RF_State;
 extern uint8_t SWITCH_RB_State;
+extern int MAXVAL;
 
 /* Chassis Velocity Variables */
 extern double output[16];
@@ -83,7 +84,7 @@ double V_Sum_Last = 0;
 
 /* Manual Control Temp Variables */
 
-double Controller_Deadband = 500;
+double Controller_Deadband = 300;
 
 /* R1 Ball Definition */
 double SHOOT_UP_TGT = 0;
@@ -150,9 +151,9 @@ char TransmitBuffer[100];
 /* Definitions for chassisTask */
 osThreadId_t chassisTaskHandle;
 const osThreadAttr_t chassisTask_attributes = {
-  .name = "chassisTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "chassisTask",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for ballTask */
 osThreadId_t ballTaskHandle;
@@ -171,9 +172,9 @@ const osThreadAttr_t clampTask_attributes = {
 /* Definitions for upperFeedbackTa */
 osThreadId_t upperFeedbackTaHandle;
 const osThreadAttr_t upperFeedbackTa_attributes = {
-  .name = "upperFeedbackTa",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "upperFeedbackTa",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -183,19 +184,19 @@ void Set_servo(TIM_HandleTypeDef *htim, uint32_t Channel, uint8_t angle, uint32_
   uint16_t compare_value = 0;
   if (angle <= 180)
   {
-    compare_value = 20000 - (0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90); // 20000-(500+angle*11.11�????)
+    compare_value = 20000 - (0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90); // 20000-(500+angle*11.11�???)
     __HAL_TIM_SET_COMPARE(htim, Channel, compare_value);
   }
 }
 
 void BALL_On(void)
 {
-  ROLL_ANG = 0;
+  ROLL_ANG = 5;
   GIVE_ANG = 26;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   SHOOT_UP_TGT = 0;
-  SHOOT_DOWN_TGT = 8000 / 2;
+  SHOOT_DOWN_TGT = 6000;
   LIFT_TGT = -16300;
 }
 
@@ -304,6 +305,7 @@ void StartChassisTask(void *argument)
     CAL_TXMESSAGE();
     if (SWITCH_LB_State == 1)
     {
+			MAXVAL=9000;
       Vx = RC.Vx;
       Vy = RC.Vy;
       omega = RC.omega;
@@ -319,9 +321,24 @@ void StartChassisTask(void *argument)
       }
       else if (SBUS_CH.ConnectState == 1)
       {
-        SBUS_LY = 10 * (SBUS_CH.CH2 - MR_CH2);
-        SBUS_RX = 10 * (SBUS_CH.CH1 - MR_CH1);
-        SBUS_LX = 10 * (SBUS_CH.CH4 - ML_CH4);
+				if(SBUS_CH.CH5>1200){
+				MAXVAL=1000;
+        SBUS_LY = 2 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 2 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 2 * (SBUS_CH.CH4 - ML_CH4);
+				}
+				else if(SBUS_CH.CH5>800&&SBUS_CH.CH5<1200){
+				MAXVAL=3000;
+        SBUS_LY = 4 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 4 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 4 * (SBUS_CH.CH4 - ML_CH4);
+				}
+				else if(SBUS_CH.CH5<800){
+				MAXVAL=5000;
+        SBUS_LY = 6 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 6 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 6 * (SBUS_CH.CH4 - ML_CH4);
+				}
       }
 
       // Self-made controller
@@ -458,13 +475,32 @@ void StartBallTask(void *argument)
       BALL_On();
       break;
 
-    case 3:
-      BALL_Step();
-      BUTTON_State = 2;
-      break;
     default:
       break;
     }
+		
+		switch (SWITCH_RF_State)
+		{
+			case 1:
+
+				GIVE_ANG = GIVE_init;
+				ROLL_ANG = 5;
+				break;
+			case 2:
+				GIVE_ANG = GIVE_init;
+				ROLL_ANG = ROLL_init;
+				break;
+			case 3:
+				GIVE_ANG = 80;
+				ROLL_ANG = ROLL_init;
+				break;
+				
+			default:
+				break;
+		}
+	  Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
+		Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
+
     osDelay(1);
   }
   /* USER CODE END StartBallTask */
@@ -509,6 +545,11 @@ void StartUpperFeedbackTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
+			if(SBUS_CH.CH6<800)
+	{
+		__disable_irq(); //鍏抽棴鎵?鏈変腑鏂? 
+		NVIC_SystemReset(); //澶嶄綅
+	}
     buff_len = sprintf(TransmitBuffer, "fg %d %d %d %d %d %d %d %d\r\n", motor_data[0]->speed_rpm, motor_data[1]->speed_rpm, motor_data[2]->speed_rpm, motor_data[3]->speed_rpm, (int)rtU.yaw_target_CH1_1, (int)rtU.yaw_target_CH1_2, (int)rtU.yaw_target_CH1_3, (int)rtU.yaw_target_CH1_4);
     HAL_UART_Transmit_DMA(&huart2, (uint8_t *)TransmitBuffer, buff_len);
 

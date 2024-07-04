@@ -7,7 +7,7 @@ extern motor_measure_t *motor_data[8];
 uint8_t data[10];
 
 double factors1 = 2;
-double factors2 = 30;
+double factors2 = 15;
 double por = 2.5;
 
 double deadband = 50;
@@ -39,15 +39,24 @@ void Reach_TGT()
   RC.dist = sqrt(pow(TC.y - RC.y, 2) + pow((TC.x - RC.x), 2));
   TC.XYtheta = atan2(TC.y - RC.y, TC.x - RC.x) * 180 / PI;
 
-  if (fabs((double)RC.dist) >= deadband && fabs((double)RC.dist) < 1000)
+  if (fabs((double)RC.dist) >= deadband && fabs((double)RC.dist) < 150)
   {
     factors1 = 2;
-    RC.dist = 1000 / factors1;
+    RC.dist = 300;
   }
-  else if (fabs((double)RC.dist) > 1000)
+	 else if (fabs((double)RC.dist) >= 150&&fabs((double)RC.dist) < 1000)
   {
-    factors1 = 4;
+    factors1 = 6;
   }
+  else if (fabs((double)RC.dist) >= 1000&&fabs((double)RC.dist) < 2000)
+  {
+    factors1 = 3;
+  }
+	else if(fabs((double)RC.dist) >= 2000)
+	{
+		    factors1 = 5;
+	}
+		
   if (fabs((double)RC.dist) > top)
   {
 
@@ -81,12 +90,12 @@ void Reach_TGT()
   else
     RC.omega = 0;
 
-  if (fabs((double)RC.omega) > 3000)
+  if (fabs((double)RC.omega) > 5000)
   {
     if (RC.omega > 0)
-      RC.omega = 3000;
+      RC.omega = 5000;
     else
-      RC.omega = -3000;
+      RC.omega = -5000;
   }
   else if (fabs((double)RC.omega) < 650)
   {
