@@ -210,6 +210,7 @@ int main(void)
   YAW_TGT[M_3508_R] = 0;
   YAW_TGT[M_3508_L] = 0;
   motorExtent.state = 0xab;
+  STR_OFF;
 
   /* USER CODE END 2 */
 
@@ -325,7 +326,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     HAL_UART_Receive_DMA(&huart2, aRxBuffer2, 1);
     if (USART2_RX_STA > USART_REC_LEN)
       USART2_RX_STA = 0;                                                              //
-    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �?????????测包头包尾以及数据包长度
+    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �?????????测包头包尾以及数据包长度
     {
       Receive();
       receivefactor[1] = 1;

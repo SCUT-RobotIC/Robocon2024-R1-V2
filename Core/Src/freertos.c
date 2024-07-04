@@ -151,30 +151,30 @@ char TransmitBuffer[100];
 /* Definitions for chassisTask */
 osThreadId_t chassisTaskHandle;
 const osThreadAttr_t chassisTask_attributes = {
-    .name = "chassisTask",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityNormal,
+  .name = "chassisTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for ballTask */
 osThreadId_t ballTaskHandle;
 const osThreadAttr_t ballTask_attributes = {
-    .name = "ballTask",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityLow,
+  .name = "ballTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for clampTask */
 osThreadId_t clampTaskHandle;
 const osThreadAttr_t clampTask_attributes = {
-    .name = "clampTask",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityLow,
+  .name = "clampTask",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
 };
 /* Definitions for upperFeedbackTa */
 osThreadId_t upperFeedbackTaHandle;
 const osThreadAttr_t upperFeedbackTa_attributes = {
-    .name = "upperFeedbackTa",
-    .stack_size = 128 * 4,
-    .priority = (osPriority_t)osPriorityLow,
+  .name = "upperFeedbackTa",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
 };
 
 /* Private function prototypes -----------------------------------------------*/
@@ -184,7 +184,7 @@ void Set_servo(TIM_HandleTypeDef *htim, uint32_t Channel, uint8_t angle, uint32_
   uint16_t compare_value = 0;
   if (angle <= 180)
   {
-    compare_value = 20000 - (0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90); // 20000-(500+angle*11.11ï¿½???)
+    compare_value = 20000 - (0.5 * countPeriod / CycleTime + angle * countPeriod / CycleTime / 90); // 20000-(500+angle*11.11ï¿????)
     __HAL_TIM_SET_COMPARE(htim, Channel, compare_value);
   }
 }
@@ -252,12 +252,11 @@ void StartUpperFeedbackTask(void *argument);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
 /**
- * @brief  FreeRTOS initialization
- * @param  None
- * @retval None
- */
-void MX_FREERTOS_Init(void)
-{
+  * @brief  FreeRTOS initialization
+  * @param  None
+  * @retval None
+  */
+void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -298,6 +297,7 @@ void MX_FREERTOS_Init(void)
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
   /* USER CODE END RTOS_EVENTS */
+
 }
 
 /* USER CODE BEGIN Header_StartChassisTask */
@@ -584,3 +584,4 @@ void StartUpperFeedbackTask(void *argument)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
+
