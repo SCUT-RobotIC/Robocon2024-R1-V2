@@ -42,11 +42,15 @@ void Reach_TGT()
   if (fabs((double)RC.dist) >= deadband && fabs((double)RC.dist) < 150)
   {
     factors1 = 2;
-    RC.dist = 300;
+    RC.dist = 150;
   }
-	 else if (fabs((double)RC.dist) >= 150&&fabs((double)RC.dist) < 1000)
+	 else if (fabs((double)RC.dist) >= 150&&fabs((double)RC.dist) < 500)
   {
     factors1 = 6;
+  }
+	  else if (fabs((double)RC.dist) >= 500&&fabs((double)RC.dist) < 1000)
+  {
+    factors1 = 3;
   }
   else if (fabs((double)RC.dist) >= 1000&&fabs((double)RC.dist) < 2000)
   {
@@ -54,7 +58,7 @@ void Reach_TGT()
   }
 	else if(fabs((double)RC.dist) >= 2000)
 	{
-		    factors1 = 5;
+		    factors1 = 3;
 	}
 		
   if (fabs((double)RC.dist) > top)

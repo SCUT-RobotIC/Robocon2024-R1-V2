@@ -172,6 +172,7 @@ void CAL_MESSAGE(void)
 			if ((B1 & 0x40) == 0 && (DataRe.data[BOT1]) == 0x40)
 			{
 				B1_count[6]++;
+				BUTTON_State = 3;
 			}
 
 

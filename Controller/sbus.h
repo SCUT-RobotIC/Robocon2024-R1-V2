@@ -31,7 +31,7 @@
 #define ML_CH3 1224 // left_spd
 #define ML_CH4 1057 // rotate
 #define MR_CH2 987	 //  right_y  max 1400 min 600
-#define MR_CH1 961	 // right_x
+#define MR_CH1 1010	 // right_x
 
 extern int command[20]; // ң࠘Ƿ˽ߝ
 

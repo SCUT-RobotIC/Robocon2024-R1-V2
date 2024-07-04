@@ -196,7 +196,7 @@ void BALL_On(void)
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   SHOOT_UP_TGT = 0;
-  SHOOT_DOWN_TGT = 6000;
+  SHOOT_DOWN_TGT = 5000;
   LIFT_TGT = -16300;
 }
 
@@ -229,6 +229,17 @@ void BALL_Stop(void)
   CAN1_cmd_chassis(output[CH1_1], output[CH1_2], output[CH1_3], output[CH1_4], output[CH1_5], output[CH1_6], output[CH1_7], 0);
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_init, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_init, 20000, 20);
+}
+
+void BALL_Reverse()
+{
+  ROLL_ANG = 5;
+  GIVE_ANG = 26;
+  Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
+  Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
+  SHOOT_UP_TGT = 0;
+  SHOOT_DOWN_TGT = 5000;
+  LIFT_TGT = 6300;
 }
 
 /* USER CODE END FunctionPrototypes */
@@ -305,7 +316,8 @@ void StartChassisTask(void *argument)
     CAL_TXMESSAGE();
     if (SWITCH_LB_State == 1)
     {
-			MAXVAL=9000;
+			MAXVAL=6000;
+			Reach_TGT();
       Vx = RC.Vx;
       Vy = RC.Vy;
       omega = RC.omega;
@@ -323,21 +335,22 @@ void StartChassisTask(void *argument)
       {
 				if(SBUS_CH.CH5>1200){
 				MAXVAL=1000;
-        SBUS_LY = 2 * (SBUS_CH.CH2 - MR_CH2);
-        SBUS_RX = 2 * (SBUS_CH.CH1 - MR_CH1);
-        SBUS_LX = 2 * (SBUS_CH.CH4 - ML_CH4);
+        SBUS_LY = 3 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 3 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 3 * (SBUS_CH.CH4 - ML_CH4);
 				}
 				else if(SBUS_CH.CH5>800&&SBUS_CH.CH5<1200){
-				MAXVAL=3000;
-        SBUS_LY = 4 * (SBUS_CH.CH2 - MR_CH2);
-        SBUS_RX = 4 * (SBUS_CH.CH1 - MR_CH1);
-        SBUS_LX = 4 * (SBUS_CH.CH4 - ML_CH4);
+				MAXVAL=4000;
+        SBUS_LY = 10 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 6 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 10 * (SBUS_CH.CH4 - ML_CH4);
 				}
 				else if(SBUS_CH.CH5<800){
-				MAXVAL=5000;
-        SBUS_LY = 6 * (SBUS_CH.CH2 - MR_CH2);
-        SBUS_RX = 6 * (SBUS_CH.CH1 - MR_CH1);
-        SBUS_LX = 6 * (SBUS_CH.CH4 - ML_CH4);
+				MAXVAL=7000;
+        SBUS_LY = 17 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 9 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 17 * (SBUS_CH.CH4 - ML_CH4);
+					
 				}
       }
 
@@ -351,6 +364,10 @@ void StartChassisTask(void *argument)
       Vy = SBUS_LY;
       omega = SBUS_RX;
 
+			if(fabs(SBUS_CH.CH1 - MR_CH1)<50)
+			{
+				omega=0;
+			}
       if (Vx > Controller_Deadband)
       {
         Vx -= Controller_Deadband;
@@ -406,30 +423,30 @@ void StartChassisTask(void *argument)
     // V_Sum_Last = V_Sum;
 
     /* Controller Disconnection Protection */
-    factor1[0]++;
+//    factor1[0]++;
 
-    if (receivefactor[0] == 0) 
-      factor[0]++;
-    if (factor[0] > 300)
-    {
-      Vx = 0;
-      Vy = 0;
-      omega = 0;
+//    if (receivefactor[0] == 0) 
+//      factor[0]++;
+//    if (factor[0] > 300)
+//    {
+//      Vx = 0;
+//      Vy = 0;
+//      omega = 0;
 
-      rx = 0;
-      ry = 0;
-      lx = 0;
-      ly = 0;
-      factor[0] = 301;
-    }
-    if (receivefactor[0] == 1)
-      factor[0] = 0;
+//      rx = 0;
+//      ry = 0;
+//      lx = 0;
+//      ly = 0;
+//      factor[0] = 301;
+//    }
+//    if (receivefactor[0] == 1)
+//      factor[0] = 0;
 
-    if (factor1[0] == 50)
-    {
-      receivefactor[0] = 0;
-      factor1[0] = 0;
-    }
+//    if (factor1[0] == 50)
+//    {
+//      receivefactor[0] = 0;
+//      factor1[0] = 0;
+//    }
 
     HAL_IWDG_Refresh(&hiwdg);
 
@@ -474,6 +491,11 @@ void StartBallTask(void *argument)
       // R1 Ball ON
       BALL_On();
       break;
+		
+		case 3:
+			// R1 Ball Reverse
+			BALL_Reverse();
+			break; 
 
     default:
       break;
@@ -545,7 +567,7 @@ void StartUpperFeedbackTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-			if(SBUS_CH.CH6<800)
+			if(SBUS_CH.CH6<800&&SBUS_CH.CH6>0)
 	{
 		__disable_irq(); //鍏抽棴鎵?鏈変腑鏂? 
 		NVIC_SystemReset(); //澶嶄綅
