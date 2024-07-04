@@ -29,6 +29,14 @@ typedef struct struct_message
   uint8_t footer;
 } DataPacket;
 
+// 上中下三档拨杆开关结构体
+typedef enum
+{
+  SWITCH_UP = 0,
+  SWITCH_MID = 1,
+  SWITCH_DOWN = 2
+} switch_enum;
+
 // 全局变量，按键状态
 extern uint8_t BUTTON_State;
 extern uint8_t B1_count[8];

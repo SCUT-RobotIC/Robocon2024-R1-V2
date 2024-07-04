@@ -6,38 +6,39 @@
 #define M_3508_R 2
 #define M_3508_L 3
 
-#define STR_ON            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
-#define STR_OFF           HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
-#define CLAW_CH2_CH4_ON   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
-#define CLAW_CH2_CH4_OFF  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
-#define CLAW_CH1_CH3_ON   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-#define CLAW_CH1_CH3_OFF  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+#define STR_ON HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);
+#define STR_OFF HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
+#define CLAW_CH2_CH4_ON HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
+#define CLAW_CH2_CH4_OFF HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_RESET);
+#define CLAW_CH1_CH3_ON HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+#define CLAW_CH1_CH3_OFF HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
 
 typedef struct
 {
   uint8_t state;
 } MotorExtentTypeDef;
 
-
-typedef enum {
+typedef enum
+{
   state_init = 0,
   state_close = 1,
   state_claw_catch = 2,
   state_claw_place = 3,
   IDLE_CLAW = 4
-}claw_enum;  
+} claw_enum;
 
-typedef enum {
+typedef enum
+{
   IDLE_PLACE = 0,
   FST_PLACE = 1,
   SEC_PLACE = 2
-}place_enum;
+} place_enum;
 
-
-typedef enum {
+typedef enum
+{
   off = 0,
   on = 1,
-}bool_T;  
+} bool_T;
 
 typedef void (*func_ptr)();
 

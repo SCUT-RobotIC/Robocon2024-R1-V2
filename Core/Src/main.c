@@ -83,7 +83,6 @@ uint8_t Cal_Parity;
 uint8_t B1_count[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 uint8_t USART_FLAG = 0;
-uint8_T BUTTON_State = 0;
 
 extern int can_output[8];
 extern uint8_t data[10];
@@ -222,7 +221,6 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
-	STR_OFF;
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -287,9 +285,6 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-
-
-
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   if (huart->Instance == USART3)
@@ -326,11 +321,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     HAL_UART_Receive_DMA(&huart2, aRxBuffer2, 1);
     if (USART2_RX_STA > USART_REC_LEN)
       USART2_RX_STA = 0;                                                              //
-    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �?????????测包头包尾以及数据包长度
+    if (USART2_RX_BUF[0] == 0x0F && USART2_RX_BUF[15] == 0xAA && USART2_RX_STA == 16) // �??????????测包头包尾以及数据包长度
     {
       Receive();
       receivefactor[1] = 1;
-
 
       USART2_RX_STA = 0;
     }
@@ -411,8 +405,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 1 */
   if (htim == &htim10)
   {
-    
-    
+
     if (HIGH_TROQUE_TRANS_FLAG)
     {
       if (HAL_I2C_Master_Transmit_DMA(&hi2c1, (uint16_t)I2C_SLAVE_ADDRESS, (uint8_t *)&motorExtent, sizeof(motorExtent)) != HAL_OK)
@@ -440,18 +433,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         CLAW_CH2_CH4_ON;
         break;
       case state_claw_place:
-        switch (next_place){
-          case FST_PLACE:
-            // CLAW_CH2_CH4_OFF;
-            CLAW_CH1_CH3_OFF;
-            next_place = SEC_PLACE;
+        switch (next_place)
+        {
+        case FST_PLACE:
+          // CLAW_CH2_CH4_OFF;
+          CLAW_CH1_CH3_OFF;
+          next_place = SEC_PLACE;
           break;
-          case SEC_PLACE:
-            // CLAW_CH1_CH3_OFF;
-            CLAW_CH2_CH4_OFF;
-            next_place = IDLE_PLACE;
+        case SEC_PLACE:
+          // CLAW_CH1_CH3_OFF;
+          CLAW_CH2_CH4_OFF;
+          next_place = IDLE_PLACE;
           break;
-          default:
+        default:
           break;
         }
         break;
@@ -488,7 +482,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     // LY = SBUS_CH.CH2 - MR_CH2;
     // RX = SBUS_CH.CH1 - MR_CH1;
     // LX = SBUS_CH.CH4 - ML_CH4;
-
 
     assign_output();
     PID_MODEL_step();

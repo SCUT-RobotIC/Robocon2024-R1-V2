@@ -63,10 +63,17 @@
 #include "calculate.h"
 #include "main.h"
 
-uint8_t SWITCH_LF_State = 0;
-uint8_t SWITCH_LB_State = 0;
-uint8_t SWITCH_RF_State = 0;
-uint8_t SWITCH_RB_State = 0;
+switch_enum SWITCH_LF_State = SWITCH_UP;
+switch_enum SWITCH_LB_State = SWITCH_UP;
+switch_enum SWITCH_RF_State = SWITCH_MID;
+switch_enum SWITCH_RB_State = SWITCH_UP;
+
+uint8_t BUTTON_State = 0;
+
+// SBUS左上拨杆开关状态
+switch_enum SWITCH_SBUS_LB_State = SWITCH_UP;
+// SBUS右上拨杆开关状态
+switch_enum SWITCH_SBUS_RF_State = SWITCH_UP;
 
 int16_t temp_switch = 0;
 
@@ -118,7 +125,6 @@ void CAL_MESSAGE(void)
 				}
 			}
 
-
 			if ((B1 & 0x02) == 0 && (DataRe.data[BOT1]) == 0x02)
 			{
 				B1_count[1]++;
@@ -129,7 +135,6 @@ void CAL_MESSAGE(void)
 					next_state = state_claw_place;
 				}
 			}
-
 
 			if ((B1 & 0x04) == 0 && (DataRe.data[BOT1]) == 0x04)
 			{
@@ -160,7 +165,6 @@ void CAL_MESSAGE(void)
 				BUTTON_State = 1;
 			}
 
-
 			if ((B1 & 0x20) == 0 && (DataRe.data[BOT1]) == 0x20)
 			{
 				B1_count[5]++;
@@ -168,13 +172,11 @@ void CAL_MESSAGE(void)
 				BUTTON_State = 2;
 			}
 
-
 			if ((B1 & 0x40) == 0 && (DataRe.data[BOT1]) == 0x40)
 			{
 				B1_count[6]++;
 				BUTTON_State = 3;
 			}
-
 
 			if ((B1 & 0x80) == 0 && (DataRe.data[BOT1]) == 0x80)
 			{
@@ -182,99 +184,87 @@ void CAL_MESSAGE(void)
 				// 按下按键8
 			}
 
-
 			// 开关更新
-			if ((B2 & 0x01) == 0 && (DataRe.data[BOT2] & 0x01) == 0x01)
+			if ((B2 & 0x03) == 0x01)
 			{
 				// 开关A1开
-				SWITCH_LB_State = 1;
+				SWITCH_LB_State = SWITCH_DOWN;
 			}
-			else if ((B2 & 0x01) == 0x01 && (DataRe.data[BOT2] & 0x01) == 0)
+			if ((B2 & 0x03) == 0x03)
 			{
 				// 开关A1关
-				SWITCH_LB_State = 0;
+				SWITCH_LB_State = SWITCH_MID;
 			}
-
-			if ((B2 & 0x02) == 0 && (DataRe.data[BOT2] & 0x02) == 0x02)
+			if ((B2 & 0x03) == 0x02)
 			{
 				// 开关A2开
-				temp_switch = 2;
-			}
-			else if ((B2 & 0x02) == 0x02 && (DataRe.data[BOT2] & 0x02) == 0)
-			{
-				// 开关A2关
-				temp_switch = 0;
+				SWITCH_LB_State = SWITCH_UP;
 			}
 
-			if ((B2 & 0x04) == 0 && (DataRe.data[BOT2] & 0x04) == 0x04)
+			if ((B2 & 0x0C) == 0x04)
 			{
 				// 开关B1开
-				temp_switch = 3;
+				SWITCH_LF_State = SWITCH_UP;
 			}
-			else if ((B2 & 0x04) == 0x04 && (DataRe.data[BOT2] & 0x04) == 0)
+			if ((B2 & 0x0C) == 0x0C)
 			{
-				// 开关B1关
-				temp_switch = 0;
+				// 开关B关
+				SWITCH_LF_State = SWITCH_MID;
 			}
-
-			if ((B2 & 0x08) == 0 && (DataRe.data[BOT2] & 0x08) == 0x08)
+			if ((B2 & 0x0C) == 0x08)
 			{
 				// 开关B2开
-				temp_switch = 4;
-			}
-			else if ((B2 & 0x08) == 0x08 && (DataRe.data[BOT2] & 0x08) == 0)
-			{
-				// 开关B2关
-				temp_switch = 0;
+				SWITCH_LF_State = SWITCH_DOWN;
 			}
 
 			if ((B2 & 0x30) == 0x10)
 			{
-
 				// 开关C1开
+				SWITCH_RB_State = SWITCH_UP;
 			}
 			if ((B2 & 0x30) == 0x30)
 			{
 				// 开关C1关
+				SWITCH_RB_State = SWITCH_MID;
 			}
 			if ((B2 & 0x30) == 0x20)
 			{
 				// 开关C2开
+				SWITCH_RB_State = SWITCH_DOWN;
 			}
 
-//			if ((B2 & 0xC0) == 0xC0 && (DataRe.data[BOT2] & 0xC0) == 0x40)
-//			{
-//				// 开关D1开
-//				SWITCH_RF_State = 1;
-//			}
-//			if (((B2 & 0xC0) == 0x80 && (DataRe.data[BOT2] & 0xC0) == 0xC0)||((B2 & 0xC0) == 0x40 && (DataRe.data[BOT2] & 0xC0) == 0xC0))
-//			{
-//				// 开关D1关
-//				SWITCH_RF_State = 2;
-//			}
-//			if ((B2 & 0xC0) == 0xC0 && (DataRe.data[BOT2] & 0xC0) == 0x80)
-//			{
-//				// 开关D1开
-//				SWITCH_RF_State = 3;
-//			}
-			
+			//			if ((B2 & 0xC0) == 0xC0 && (DataRe.data[BOT2] & 0xC0) == 0x40)
+			//			{
+			//				// 开关D1开
+			//				SWITCH_RF_State = 1;
+			//			}
+			//			if (((B2 & 0xC0) == 0x80 && (DataRe.data[BOT2] & 0xC0) == 0xC0)||((B2 & 0xC0) == 0x40 && (DataRe.data[BOT2] & 0xC0) == 0xC0))
+			//			{
+			//				// 开关D1关
+			//				SWITCH_RF_State = 2;
+			//			}
+			//			if ((B2 & 0xC0) == 0xC0 && (DataRe.data[BOT2] & 0xC0) == 0x80)
+			//			{
+			//				// 开关D1开
+			//				SWITCH_RF_State = 3;
+			//			}
+
 			if ((B2 & 0xC0) == 0x40)
 			{
 				// 开关D1开
-				SWITCH_RF_State = 1;
+				SWITCH_RF_State = SWITCH_UP;
 			}
 			if ((B2 & 0xC0) == 0xC0)
 			{
 				// 开关D1关
-				SWITCH_RF_State = 2;
+				SWITCH_RF_State = SWITCH_MID;
 			}
 			if ((B2 & 0xC0) == 0x80)
 			{
 				// 开关D1开
-				SWITCH_RF_State = 3;
+				SWITCH_RF_State = SWITCH_DOWN;
 			}
-			
-			
+
 			// 更新标志位
 
 			B1 = DataRe.data[BOT1];
