@@ -190,8 +190,8 @@ int main(void)
 
   // Ball PID Init
   PID_Speed_Para_Init(1, 5, 2, 0.7, 0.1);
-  PID_Speed_Para_Init(1, 6, 2, 0.7, 0.1);
-  PID_Speed_Para_Init(1, 7, 2, 0.7, 0.1);
+  PID_Speed_Para_Init(1, 6, 2, 2.7, 0.1);
+  PID_Speed_Para_Init(1, 7, 2, 2.7, 0.1);
 
   // Clamp PID Init
   PID_Angle_S_Para_Init(2, 3, 0.6901 * 0.75, 2.3727 * 0.17, 0.01);
@@ -221,6 +221,7 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
+	STR_OFF;
 
   /* We should never get here as control is now taken by the scheduler */
 
@@ -285,6 +286,9 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+
+
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   if (huart->Instance == USART3)
@@ -325,7 +329,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
       Receive();
       receivefactor[1] = 1;
-      Reach_TGT();
+
 
       USART2_RX_STA = 0;
     }
@@ -437,13 +441,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       case state_claw_place:
         switch (next_place){
           case FST_PLACE:
-            CLAW_CH2_CH4_OFF;
-            // CLAW_CH1_CH3_OFF;
+            // CLAW_CH2_CH4_OFF;
+            CLAW_CH1_CH3_OFF;
             next_place = SEC_PLACE;
           break;
           case SEC_PLACE:
-            CLAW_CH1_CH3_OFF;
-            // CLAW_CH2_CH4_OFF;
+            // CLAW_CH1_CH3_OFF;
+            CLAW_CH2_CH4_OFF;
             next_place = IDLE_PLACE;
           break;
           default:

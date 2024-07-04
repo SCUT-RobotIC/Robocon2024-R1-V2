@@ -172,7 +172,6 @@ void CAL_MESSAGE(void)
 			if ((B1 & 0x40) == 0 && (DataRe.data[BOT1]) == 0x40)
 			{
 				B1_count[6]++;
-				// 按下按键7，球发射
 				BUTTON_State = 3;
 			}
 
@@ -229,42 +228,53 @@ void CAL_MESSAGE(void)
 				temp_switch = 0;
 			}
 
-			if ((B2 & 0x10) == 0 && (DataRe.data[BOT2] & 0x10) == 0x10)
+			if ((B2 & 0x30) == 0x10)
 			{
 
 				// 开关C1开
 			}
-			else if ((B2 & 0x10) == 0x10 && (DataRe.data[BOT2] & 0x10) == 0)
+			if ((B2 & 0x30) == 0x30)
 			{
 				// 开关C1关
 			}
-
-			if ((B2 & 0x20) == 0 && (DataRe.data[BOT2] & 0x20) == 0x20)
+			if ((B2 & 0x30) == 0x20)
 			{
 				// 开关C2开
 			}
-			else if ((B2 & 0x20) == 0x20 && (DataRe.data[BOT2] & 0x20) == 0)
-			{
-				// 开关C2关
-			}
 
-			if ((B2 & 0x40) == 0 && (DataRe.data[BOT2] & 0x40) == 0x40)
+//			if ((B2 & 0xC0) == 0xC0 && (DataRe.data[BOT2] & 0xC0) == 0x40)
+//			{
+//				// 开关D1开
+//				SWITCH_RF_State = 1;
+//			}
+//			if (((B2 & 0xC0) == 0x80 && (DataRe.data[BOT2] & 0xC0) == 0xC0)||((B2 & 0xC0) == 0x40 && (DataRe.data[BOT2] & 0xC0) == 0xC0))
+//			{
+//				// 开关D1关
+//				SWITCH_RF_State = 2;
+//			}
+//			if ((B2 & 0xC0) == 0xC0 && (DataRe.data[BOT2] & 0xC0) == 0x80)
+//			{
+//				// 开关D1开
+//				SWITCH_RF_State = 3;
+//			}
+			
+			if ((B2 & 0xC0) == 0x40)
 			{
 				// 开关D1开
+				SWITCH_RF_State = 1;
 			}
-			else if ((B2 & 0x40) == 0x40 && (DataRe.data[BOT2] & 0x40) == 0)
+			if ((B2 & 0xC0) == 0xC0)
 			{
 				// 开关D1关
+				SWITCH_RF_State = 2;
 			}
-
-			if ((B2 & 0x80) == 0 && (DataRe.data[BOT2] & 0x80) == 0x80)
+			if ((B2 & 0xC0) == 0x80)
 			{
 				// 开关D1开
+				SWITCH_RF_State = 3;
 			}
-			else if ((B2 & 0x80) == 0x80 && (DataRe.data[BOT2] & 0x80) == 0)
-			{
-				// 开关D2关
-			}
+			
+			
 			// 更新标志位
 
 			B1 = DataRe.data[BOT1];

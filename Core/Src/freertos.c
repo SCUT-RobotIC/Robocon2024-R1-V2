@@ -74,6 +74,7 @@ extern uint8_t SWITCH_LF_State;
 extern uint8_t SWITCH_LB_State;
 extern uint8_t SWITCH_RF_State;
 extern uint8_t SWITCH_RB_State;
+extern int MAXVAL;
 
 /* Chassis Velocity Variables */
 extern double output[16];
@@ -83,7 +84,7 @@ double V_Sum_Last = 0;
 
 /* Manual Control Temp Variables */
 
-double Controller_Deadband = 500;
+double Controller_Deadband = 300;
 
 /* R1 Ball Definition */
 double SHOOT_UP_TGT = 0;
@@ -190,12 +191,12 @@ void Set_servo(TIM_HandleTypeDef *htim, uint32_t Channel, uint8_t angle, uint32_
 
 void BALL_On(void)
 {
-  ROLL_ANG = 0;
+  ROLL_ANG = 5;
   GIVE_ANG = 26;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   SHOOT_UP_TGT = 0;
-  SHOOT_DOWN_TGT = 8000 / 2;
+  SHOOT_DOWN_TGT = 5000;
   LIFT_TGT = -16300;
 }
 
@@ -228,6 +229,17 @@ void BALL_Stop(void)
   CAN1_cmd_chassis(output[CH1_1], output[CH1_2], output[CH1_3], output[CH1_4], output[CH1_5], output[CH1_6], output[CH1_7], 0);
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_init, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_init, 20000, 20);
+}
+
+void BALL_Reverse()
+{
+  ROLL_ANG = 5;
+  GIVE_ANG = 26;
+  Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
+  Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
+  SHOOT_UP_TGT = 0;
+  SHOOT_DOWN_TGT = 5000;
+  LIFT_TGT = 6300;
 }
 
 /* USER CODE END FunctionPrototypes */
@@ -304,6 +316,8 @@ void StartChassisTask(void *argument)
     CAL_TXMESSAGE();
     if (SWITCH_LB_State == 1)
     {
+			MAXVAL=6000;
+			Reach_TGT();
       Vx = RC.Vx;
       Vy = RC.Vy;
       omega = RC.omega;
@@ -319,21 +333,41 @@ void StartChassisTask(void *argument)
       }
       else if (SBUS_CH.ConnectState == 1)
       {
+				if(SBUS_CH.CH5>1200){
+				MAXVAL=1000;
+        SBUS_LY = 3 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 3 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 3 * (SBUS_CH.CH4 - ML_CH4);
+				}
+				else if(SBUS_CH.CH5>800&&SBUS_CH.CH5<1200){
+				MAXVAL=4000;
         SBUS_LY = 10 * (SBUS_CH.CH2 - MR_CH2);
-        SBUS_RX = 10 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_RX = 6 * (SBUS_CH.CH1 - MR_CH1);
         SBUS_LX = 10 * (SBUS_CH.CH4 - ML_CH4);
+				}
+				else if(SBUS_CH.CH5<800){
+				MAXVAL=7000;
+        SBUS_LY = 17 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 9 * (SBUS_CH.CH1 - MR_CH1);
+        SBUS_LX = 17 * (SBUS_CH.CH4 - ML_CH4);
+					
+				}
       }
 
       // Self-made controller
-      Vx = rx / 9;
-      Vy = ry / 9;
-      omega = lx / 9;
+      // Vx = rx / 9;
+      // Vy = ry / 9;
+      // omega = lx / 9;
 
       // Model controller
-      // Vx = SBUS_LX;
-      // Vy = SBUS_LY;
-      // omega = SBUS_RX;
+      Vx = SBUS_LX;
+      Vy = SBUS_LY;
+      omega = SBUS_RX;
 
+			if(fabs(SBUS_CH.CH1 - MR_CH1)<50)
+			{
+				omega=0;
+			}
       if (Vx > Controller_Deadband)
       {
         Vx -= Controller_Deadband;
@@ -389,30 +423,30 @@ void StartChassisTask(void *argument)
     // V_Sum_Last = V_Sum;
 
     /* Controller Disconnection Protection */
-    factor1[0]++;
+//    factor1[0]++;
 
-    if (receivefactor[0] == 0) 
-      factor[0]++;
-    if (factor[0] > 300)
-    {
-      Vx = 0;
-      Vy = 0;
-      omega = 0;
+//    if (receivefactor[0] == 0) 
+//      factor[0]++;
+//    if (factor[0] > 300)
+//    {
+//      Vx = 0;
+//      Vy = 0;
+//      omega = 0;
 
-      rx = 0;
-      ry = 0;
-      lx = 0;
-      ly = 0;
-      factor[0] = 301;
-    }
-    if (receivefactor[0] == 1)
-      factor[0] = 0;
+//      rx = 0;
+//      ry = 0;
+//      lx = 0;
+//      ly = 0;
+//      factor[0] = 301;
+//    }
+//    if (receivefactor[0] == 1)
+//      factor[0] = 0;
 
-    if (factor1[0] == 50)
-    {
-      receivefactor[0] = 0;
-      factor1[0] = 0;
-    }
+//    if (factor1[0] == 50)
+//    {
+//      receivefactor[0] = 0;
+//      factor1[0] = 0;
+//    }
 
     HAL_IWDG_Refresh(&hiwdg);
 
@@ -457,14 +491,38 @@ void StartBallTask(void *argument)
       // R1 Ball ON
       BALL_On();
       break;
+		
+		case 3:
+			// R1 Ball Reverse
+			BALL_Reverse();
+			break; 
 
-    case 3:
-      BALL_Step();
-      BUTTON_State = 2;
-      break;
     default:
       break;
     }
+		
+		switch (SWITCH_RF_State)
+		{
+			case 1:
+
+				GIVE_ANG = GIVE_init;
+				ROLL_ANG = 5;
+				break;
+			case 2:
+				GIVE_ANG = GIVE_init;
+				ROLL_ANG = ROLL_init;
+				break;
+			case 3:
+				GIVE_ANG = 80;
+				ROLL_ANG = ROLL_init;
+				break;
+				
+			default:
+				break;
+		}
+	  Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
+		Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
+
     osDelay(1);
   }
   /* USER CODE END StartBallTask */
@@ -509,6 +567,11 @@ void StartUpperFeedbackTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
+			if(SBUS_CH.CH6<800&&SBUS_CH.CH6>0)
+	{
+		__disable_irq(); //鍏抽棴鎵?鏈変腑鏂? 
+		NVIC_SystemReset(); //澶嶄綅
+	}
     buff_len = sprintf(TransmitBuffer, "fg %d %d %d %d %d %d %d %d\r\n", motor_data[0]->speed_rpm, motor_data[1]->speed_rpm, motor_data[2]->speed_rpm, motor_data[3]->speed_rpm, (int)rtU.yaw_target_CH1_1, (int)rtU.yaw_target_CH1_2, (int)rtU.yaw_target_CH1_3, (int)rtU.yaw_target_CH1_4);
     HAL_UART_Transmit_DMA(&huart2, (uint8_t *)TransmitBuffer, buff_len);
 
