@@ -6,9 +6,12 @@ void claw_catch(void)
 {
     claw_flag = on;
     claw_state = state_claw_catch;
-    HAL_Delay(200);
-    YAW_TGT[M_3508_R] = 400;
-    YAW_TGT[M_3508_L] = -400;
+    // HAL_Delay(200);
+    // YAW_TGT[M_3508_R] = 400;
+    // YAW_TGT[M_3508_L] = -400;
+    HAL_Delay(300);
+    YAW_TGT[M_3508_R] = 450;
+    YAW_TGT[M_3508_L] = -450;
     next_place = FST_PLACE;
 }
 

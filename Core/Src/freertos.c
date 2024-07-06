@@ -603,9 +603,7 @@ void StartClampTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    if (RC.action == CLAMP_PINCH)
-    {
-    }
+
 
     LOGIC();
 

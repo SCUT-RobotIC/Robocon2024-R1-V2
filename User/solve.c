@@ -30,7 +30,7 @@ void Receive()
   TC.y = (USART2_RX_BUF[10] << 8) | USART2_RX_BUF[9];
   TC.theta = (USART2_RX_BUF[12] << 8) | USART2_RX_BUF[11];
 
-  RC.action = (USART2_RX_BUF[14] << 8) | USART2_RX_BUF[13];
+  RC.side = (USART2_RX_BUF[14] << 8) | USART2_RX_BUF[13];
 }
 void Reach_TGT()
 {
