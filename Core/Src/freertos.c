@@ -105,7 +105,7 @@ REAL_COOR RC;
 const int M3508_MAX = 8911;
 const int M2006_MAX = 14976;
 
-const int ROLL_init = 120, GIVE_init = 26;
+const int ROLL_init = 120, GIVE_init = 22;
 int ROLL_ANG = ROLL_init, GIVE_ANG = GIVE_init;
 int ROLL_state = 0, GIVE_state = 0;
 
@@ -201,8 +201,8 @@ void Set_servo(TIM_HandleTypeDef *htim, uint32_t Channel, uint8_t angle, uint32_
 
 void BALL_On(void)
 {
-  ROLL_ANG = 5;
-  GIVE_ANG = 26;
+  ROLL_ANG = 0;
+  GIVE_ANG = 22;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   SHOOT_UP_TGT = 0;
@@ -216,7 +216,7 @@ void BALL_Step(void)
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   HAL_Delay(3000);
 
-  GIVE_ANG = 80;
+  GIVE_ANG = 50;
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   HAL_Delay(1000);
 
@@ -243,8 +243,8 @@ void BALL_Stop(void)
 
 void BALL_Reverse()
 {
-  ROLL_ANG = 5;
-  GIVE_ANG = 26;
+  ROLL_ANG = 0;
+  GIVE_ANG = 22;
   Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
   Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
   SHOOT_UP_TGT = 0;
@@ -568,14 +568,14 @@ void StartBallTask(void *argument)
     case SWITCH_UP:
 
       GIVE_ANG = GIVE_init;
-      ROLL_ANG = 5;
+      ROLL_ANG = 0;
       break;
     case SWITCH_MID:
       GIVE_ANG = GIVE_init;
       ROLL_ANG = ROLL_init;
       break;
     case SWITCH_DOWN:
-      GIVE_ANG = 80;
+      GIVE_ANG = 50;
       ROLL_ANG = ROLL_init;
       break;
 
