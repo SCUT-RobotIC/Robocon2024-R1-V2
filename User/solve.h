@@ -5,7 +5,8 @@
 #include "motorctrl.h"
 
 /* ACTION DEFINITION */
-#define CLAMP_PINCH 2
+#define LEFT_SIDE 0
+#define RIGHT_SIDE 1
 
 typedef struct
 {
@@ -37,8 +38,8 @@ typedef struct
 	int16_t Vy;
 	int16_t omega;
 
-	// 动作数据位
-	int16_t action;
+	// Right/Left Side Selection
+	int16_t side;
 } REAL_COOR;
 void Receive(void);
 void Reach_TGT(void);
