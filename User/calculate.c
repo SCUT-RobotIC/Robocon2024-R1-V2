@@ -70,11 +70,6 @@ switch_enum SWITCH_RB_State = SWITCH_UP;
 
 uint8_t BUTTON_State = 0;
 
-// SBUS左上拨杆开关状态
-switch_enum SWITCH_SBUS_LB_State = SWITCH_UP;
-// SBUS右上拨杆开关状态
-switch_enum SWITCH_SBUS_RF_State = SWITCH_UP;
-
 int16_t temp_switch = 0;
 
 // 计算校验位

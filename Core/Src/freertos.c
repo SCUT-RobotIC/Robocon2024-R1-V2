@@ -70,14 +70,7 @@ extern uint8_t B1, B2;
 extern uint8_t Cal_Parity;
 
 extern uint8_t BUTTON_State;
-extern switch_enum SWITCH_LF_State;
-extern switch_enum SWITCH_LB_State;
-extern switch_enum SWITCH_RF_State;
-extern switch_enum SWITCH_RB_State;
 extern int MAXVAL;
-
-extern switch_enum SWITCH_SBUS_LB_State;
-extern switch_enum SWITCH_SBUS_RF_State;
 
 /* Chassis Velocity Variables */
 extern double output[16];
@@ -328,172 +321,77 @@ void StartChassisTask(void *argument)
   for (;;)
   {
     CAL_TXMESSAGE();
-    if (SWITCH_SBUS_LB_State == SWITCH_MID && SWITCH_LB_State == SWITCH_DOWN || SWITCH_LB_State == SWITCH_MID)
+    // Model controller
+    if (SBUS_CH.ConnectState == 0)
     {
-      MAXVAL = 6000;
-      Reach_TGT();
-      Vx = RC.Vx;
-      Vy = RC.Vy;
-      omega = RC.omega;
+      SBUS_LY = 0;
+      SBUS_RX = 0;
+      SBUS_LX = 0;
     }
-    else if (SWITCH_SBUS_LB_State == SWITCH_UP && SWITCH_LB_State == SWITCH_DOWN)
+    else if (SBUS_CH.ConnectState == 1)
     {
-      // Model controller
-      if (SBUS_CH.ConnectState == 0)
-      {
-        SBUS_LY = 0;
-        SBUS_RX = 0;
-        SBUS_LX = 0;
-      }
-      else if (SBUS_CH.ConnectState == 1)
-      {
-        if (SWITCH_SBUS_RF_State == SWITCH_MID || SWITCH_SBUS_RF_State == SWITCH_UP)
-        {
-          MAXVAL = 4000;
-          SBUS_LY = 10 * (SBUS_CH.CH2 - MR_CH2);
-          SBUS_RX = 6 * (SBUS_CH.CH1 - MR_CH1);
-          SBUS_LX = 10 * (SBUS_CH.CH4 - ML_CH4);
-        }
-        else if (SWITCH_SBUS_RF_State == SWITCH_DOWN)
-        {
-          MAXVAL = 7000;
-          SBUS_LY = 17 * (SBUS_CH.CH2 - MR_CH2);
-          SBUS_RX = 9 * (SBUS_CH.CH1 - MR_CH1);
-          SBUS_LX = 17 * (SBUS_CH.CH4 - ML_CH4);
-        }
-      }
-
-      Vx = SBUS_LX;
-      Vy = SBUS_LY;
-      omega = SBUS_RX;
-
-      if (Vx > Controller_Deadband)
-      {
-        Vx -= Controller_Deadband;
-      }
-      else if (Vx < -Controller_Deadband)
-      {
-        Vx += Controller_Deadband;
-      }
-      else
-      {
-        Vx = 0;
-      }
-
-      if (Vy > Controller_Deadband)
-      {
-        Vy -= Controller_Deadband;
-      }
-      else if (Vy < -Controller_Deadband)
-      {
-        Vy += Controller_Deadband;
-      }
-      else
-      {
-        Vy = 0;
-      }
-
-      if (omega > Controller_Deadband)
-      {
-        omega -= Controller_Deadband;
-      }
-      else if (omega < -Controller_Deadband)
-      {
-        omega += Controller_Deadband;
-      }
-      else
-      {
-        omega = 0;
-      }
-
-      if (fabs(SBUS_CH.CH1 - MR_CH1) < 50)
-      {
-        omega = 0;
-      }
-    }
-    else if (SWITCH_LB_State == SWITCH_UP)
-    {
-      // Self-made controller
-      if (SWITCH_LF_State == SWITCH_UP)
+      if (SBUS_SWA_State == SWITCH_DOWN)
       {
         MAXVAL = 4000;
-        Vx = lx / 9 * 0.75;
-        Vy = ly / 9 * 0.75;
-        omega = rx / 9 * 0.75; 
+        SBUS_LX = 6 * (SBUS_CH.CH4 - ML_CH4);
+        SBUS_LY = 6 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 4 * (SBUS_CH.CH1 - MR_CH1);
       }
-      else if (SWITCH_LF_State == SWITCH_DOWN || SWITCH_LF_State == SWITCH_MID)
+      else if (SBUS_SWA_State == SWITCH_UP)
       {
-        MAXVAL = 7000;
-        Vx = lx / 9;
-        Vy = ly / 9;
-        omega = rx / 9;
+        MAXVAL = 8000;
+        SBUS_LX = 10 * (SBUS_CH.CH4 - ML_CH4);
+        SBUS_LY = 10 * (SBUS_CH.CH2 - MR_CH2);
+        SBUS_RX = 6 * (SBUS_CH.CH1 - MR_CH1);
       }
+    }
 
+    Vx = SBUS_LX;
+    Vy = SBUS_LY;
+    omega = SBUS_RX;
 
-      if (Vx > Controller_Deadband)
-      {
-        Vx -= Controller_Deadband;
-      }
-      else if (Vx < -Controller_Deadband)
-      {
-        Vx += Controller_Deadband;
-      }
-      else
-      {
-        Vx = 0;
-      }
+    if (Vx > Controller_Deadband)
+    {
+      Vx -= Controller_Deadband;
+    }
+    else if (Vx < -Controller_Deadband)
+    {
+      Vx += Controller_Deadband;
+    }
+    else
+    {
+      Vx = 0;
+    }
 
-      if (Vy > Controller_Deadband)
-      {
-        Vy -= Controller_Deadband;
-      }
-      else if (Vy < -Controller_Deadband)
-      {
-        Vy += Controller_Deadband;
-      }
-      else
-      {
-        Vy = 0;
-      }
+    if (Vy > Controller_Deadband)
+    {
+      Vy -= Controller_Deadband;
+    }
+    else if (Vy < -Controller_Deadband)
+    {
+      Vy += Controller_Deadband;
+    }
+    else
+    {
+      Vy = 0;
+    }
 
-      if (omega > Controller_Deadband)
-      {
-        omega -= Controller_Deadband;
-      }
-      else if (omega < -Controller_Deadband)
-      {
-        omega += Controller_Deadband;
-      }
-      else
-      {
-        omega = 0;
-      }
+    if (omega > Controller_Deadband)
+    {
+      omega -= Controller_Deadband;
+    }
+    else if (omega < -Controller_Deadband)
+    {
+      omega += Controller_Deadband;
+    }
+    else
+    {
+      omega = 0;
+    }
 
-      /* Controller Disconnection Protection */
-      factor1[0]++;
-
-      if (receivefactor[0] == 0)
-        factor[0]++;
-      if (factor[0] > 300)
-      {
-        Vx = 0;
-        Vy = 0;
-        omega = 0;
-
-        rx = 0;
-        ry = 0;
-        lx = 0;
-        ly = 0;
-        factor[0] = 301;
-      }
-      if (receivefactor[0] == 1)
-        factor[0] = 0;
-
-      if (factor1[0] == 50)
-      {
-        receivefactor[0] = 0;
-        factor1[0] = 0;
-      }
+    if (fabs(SBUS_CH.CH1 - MR_CH1) < 50)
+    {
+      omega = 0;
     }
 
     /* Soft Speed UP */
@@ -541,46 +439,50 @@ void StartBallTask(void *argument)
     rtU.yaw_target_CH1_6 = -SHOOT_DOWN_TGT;
     rtU.yaw_target_CH1_7 = SHOOT_DOWN_TGT;
 
-    switch (BUTTON_State)
+    if (SBUS_SWD_State == SWITCH_DOWN && SBUS_CH.CH6 > 360)
     {
+      switch (SBUS_SWB_State)
+      {
+      case SWITCH_UP:
+        // R1 Ball ON
+        BALL_On();
+        break;
 
-    case 1:
-      // Emergency Stop
+      case SWITCH_DOWN:
+        // R1 Ball Reverse
+        BALL_Reverse();
+        break;
+
+      default:
+        break;
+      }
+    }
+    else if (SBUS_SWD_State == SWITCH_DOWN && SBUS_CH.CH6 < 360)
+    {
+      // R1 Ball Stop
       BALL_Stop();
-      break;
-
-    case 2:
-      // R1 Ball ON
-      BALL_On();
-      break;
-
-    case 3:
-      // R1 Ball Reverse
-      BALL_Reverse();
-      break;
-
-    default:
-      break;
     }
 
-    switch (SWITCH_RF_State)
+    if (SBUS_SWD_State == SWITCH_DOWN)
     {
-    case SWITCH_UP:
+      switch (SBUS_SWC_State)
+      {
+      case SWITCH_UP:
+        GIVE_ANG = 50;
+        ROLL_ANG = ROLL_init;
+        break;
+      case SWITCH_MID:
+        GIVE_ANG = GIVE_init;
+        ROLL_ANG = ROLL_init;
+        break;
+      case SWITCH_DOWN:
+        GIVE_ANG = GIVE_init;
+        ROLL_ANG = 0;
+        break;
 
-      GIVE_ANG = GIVE_init;
-      ROLL_ANG = 0;
-      break;
-    case SWITCH_MID:
-      GIVE_ANG = GIVE_init;
-      ROLL_ANG = ROLL_init;
-      break;
-    case SWITCH_DOWN:
-      GIVE_ANG = 50;
-      ROLL_ANG = ROLL_init;
-      break;
-
-    default:
-      break;
+      default:
+        break;
+      }
     }
     Set_servo(&htim5, TIM_CHANNEL_1, ROLL_ANG, 20000, 20);
     Set_servo(&htim5, TIM_CHANNEL_2, GIVE_ANG, 20000, 20);
@@ -603,7 +505,6 @@ void StartClampTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-
 
     LOGIC();
 
@@ -653,34 +554,93 @@ void StartSBUSTask(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    if (SBUS_CH.CH5 > 1200)
+    if (SBUS_CH.CH7 > 1200)
     {
-      SWITCH_SBUS_LB_State = SWITCH_DOWN;
+      SBUS_SWA_State = SWITCH_DOWN;
     }
-    else if (SBUS_CH.CH5 > 800 && SBUS_CH.CH5 < 1200)
+    else if (SBUS_CH.CH7 < 800)
     {
-      SWITCH_SBUS_LB_State = SWITCH_MID;
-    }
-    else if (SBUS_CH.CH5 < 800)
-    {
-      SWITCH_SBUS_LB_State = SWITCH_UP;
+      SBUS_SWA_State = SWITCH_UP;
     }
 
-    if (SBUS_CH.CH6 > 1200)
+    if (SBUS_CH.CH8 > 1200)
     {
-      SWITCH_SBUS_RF_State = SWITCH_DOWN;
+      SBUS_SWB_State = SWITCH_DOWN;
     }
-    else if (SBUS_CH.CH6 > 800 && SBUS_CH.CH6 < 1200)
+    else if (SBUS_CH.CH8 < 800)
     {
-      SWITCH_SBUS_RF_State = SWITCH_MID;
+      SBUS_SWB_State = SWITCH_UP;
     }
-    else if (SBUS_CH.CH6 < 800)
+
+    if (SBUS_CH.CH9 > 1200)
     {
-      SWITCH_SBUS_RF_State = SWITCH_UP;
+      SBUS_SWC_State = SWITCH_DOWN;
     }
-  osDelay(1);
+    else if (SBUS_CH.CH9 > 800 && SBUS_CH.CH9 < 1200)
+    {
+      SBUS_SWC_State = SWITCH_MID;
+    }
+    else if (SBUS_CH.CH9 < 800)
+    {
+      SBUS_SWC_State = SWITCH_UP;
+    }
+
+    if (SBUS_CH.CH10 > 1200)
+    {
+      SBUS_SWD_State = SWITCH_DOWN;
+    }
+    else if (SBUS_CH.CH10 < 800)
+    {
+      SBUS_SWD_State = SWITCH_UP;
+    }
+
+    if (SBUS_SWD_Last_State != SWITCH_UP && SBUS_SWD_State == SWITCH_UP)
+    {
+      // Auto initialize the clamp
+      if (!LOGIC_FLAG)
+      {
+        LOGIC_FLAG = on;
+        next_state = state_init;
+      }
+    }
+    else if (SBUS_SWD_Last_State != SWITCH_DOWN && SBUS_SWD_State == SWITCH_DOWN)
+    {
+      // Auto close the clamp
+      if (!LOGIC_FLAG)
+      {
+        LOGIC_FLAG = on;
+        next_state = state_close;
+      }
+    }
+
+    if (SBUS_SWD_State == SWITCH_UP && SBUS_SWB_State == SWITCH_DOWN)
+    {
+
+      if (SBUS_SWC_State == SWITCH_UP && SBUS_SWC_Last_State != SWITCH_UP)
+      {
+        if (!LOGIC_FLAG)
+        {
+          LOGIC_FLAG = on;
+          next_state = state_claw_catch;
+        }
+      }
+      else if ((SBUS_SWC_State == SWITCH_MID && SBUS_SWC_Last_State != SWITCH_MID) || (SBUS_SWC_State == SWITCH_DOWN && SBUS_SWC_Last_State != SWITCH_DOWN))
+      {
+        if (!LOGIC_FLAG)
+        {
+          LOGIC_FLAG = on;
+          next_state = state_claw_place;
+        }
+      }
+    }
+
+    SBUS_SWA_Last_State = SBUS_SWA_State;
+    SBUS_SWB_Last_State = SBUS_SWB_State;
+    SBUS_SWC_Last_State = SBUS_SWC_State;
+    SBUS_SWD_Last_State = SBUS_SWD_State;
+
+    osDelay(1);
   }
-
 }
 /* USER CODE END StartSBUSTask */
 

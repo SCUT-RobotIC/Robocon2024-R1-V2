@@ -3,6 +3,7 @@
 
 #include "main.h"
 #include "new_logic.h"
+#include "sbus.h"
 
 // 重定义数组位
 #define LX_LSB 0
@@ -29,13 +30,6 @@ typedef struct struct_message
   uint8_t footer;
 } DataPacket;
 
-// 上中下三档拨杆开关结构体
-typedef enum
-{
-  SWITCH_UP = 0,
-  SWITCH_MID = 1,
-  SWITCH_DOWN = 2
-} switch_enum;
 
 // 全局变量，按键状态
 extern uint8_t BUTTON_State;
@@ -52,6 +46,12 @@ extern uint8_t Cal_Parity;
 extern bool_T LOGIC_FLAG;
 extern claw_enum next_state;
 extern int button_press_count;
+
+extern switch_enum SWITCH_LF_State;
+extern switch_enum SWITCH_LB_State;
+extern switch_enum SWITCH_RF_State;
+extern switch_enum SWITCH_RB_State;
+
 
 uint8_t CalculateParity(const uint8_t *data, int dataSize);
 

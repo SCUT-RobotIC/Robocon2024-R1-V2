@@ -4,6 +4,16 @@ SBUS_CH_Struct SBUS_CH;
 
 int SBUS_LY, SBUS_LX, SBUS_RX;
 
+switch_enum SBUS_SWA_State = SWITCH_UP;
+switch_enum SBUS_SWB_State = SWITCH_UP;
+switch_enum SBUS_SWC_State = SWITCH_UP;
+switch_enum SBUS_SWD_State = SWITCH_UP;
+
+switch_enum SBUS_SWA_Last_State = SWITCH_UP;
+switch_enum SBUS_SWB_Last_State = SWITCH_UP;
+switch_enum SBUS_SWC_Last_State = SWITCH_UP;
+switch_enum SBUS_SWD_Last_State = SWITCH_UP;
+
 uint8_t update_sbus(uint8_t *buf)
 {
     if (buf[23] == 0)

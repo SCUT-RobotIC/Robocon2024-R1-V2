@@ -29,9 +29,9 @@
 #define SPEED_MODE 6
 
 #define ML_CH3 1224 // left_spd
-#define ML_CH4 1057 // rotate
-#define MR_CH2 987	 //  right_y  max 1400 min 600
-#define MR_CH1 1010	 // right_x
+#define ML_CH4 1000 // rotate
+#define MR_CH2 1000	 //  right_y  max 1400 min 600
+#define MR_CH1 1000	 // right_x
 
 extern int command[20]; // ң࠘Ƿ˽ߝ
 
@@ -57,8 +57,26 @@ typedef struct
 	uint8_t ConnectState; // ң࠘Ƿԫޓ˕Ƿlޓ״̬ 0=δlޓì1=ֽӣlޓ
 } SBUS_CH_Struct;
 
+// 上中下三档拨杆开关结构体
+typedef enum
+{
+  SWITCH_UP = 0,
+  SWITCH_MID = 1,
+  SWITCH_DOWN = 2
+} switch_enum;
+
 extern SBUS_CH_Struct SBUS_CH;
 extern int SBUS_LY, SBUS_LX, SBUS_RX;
+
+extern switch_enum SBUS_SWA_State;
+extern switch_enum SBUS_SWB_State;
+extern switch_enum SBUS_SWC_State;
+extern switch_enum SBUS_SWD_State;
+
+extern switch_enum SBUS_SWA_Last_State;
+extern switch_enum SBUS_SWB_Last_State;
+extern switch_enum SBUS_SWC_Last_State;
+extern switch_enum SBUS_SWD_Last_State;
 
 // SBUSхۅޢ϶Рژگ˽
 uint8_t update_sbus(uint8_t *buf);
