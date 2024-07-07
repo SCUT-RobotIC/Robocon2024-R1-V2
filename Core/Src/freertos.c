@@ -468,16 +468,16 @@ void StartBallTask(void *argument)
       switch (SBUS_SWC_State)
       {
       case SWITCH_UP:
-        GIVE_ANG = 50;
-        ROLL_ANG = ROLL_init;
+        GIVE_ANG = GIVE_init;
+        ROLL_ANG = 0;
         break;
       case SWITCH_MID:
         GIVE_ANG = GIVE_init;
         ROLL_ANG = ROLL_init;
         break;
       case SWITCH_DOWN:
-        GIVE_ANG = GIVE_init;
-        ROLL_ANG = 0;
+        GIVE_ANG = 50;
+        ROLL_ANG = ROLL_init;
         break;
 
       default:
